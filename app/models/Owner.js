@@ -20,6 +20,9 @@ const OwnerSchema = new mongoose.Schema({
     project : [
         {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
     ],
+    user_id : [
+        {type: mongoose.Schema.Types.ObjectId,ref:'User'}
+    ],
     inv_id :[
         {type:mongoose.Schema.Types.ObjectId,ref:'Inv'}
     ]

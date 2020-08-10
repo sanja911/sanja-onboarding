@@ -1,15 +1,19 @@
 const mongoose  = require('mongoose');
 const ProjSchema = new mongoose.Schema({
     proj_name:{
-        type:String,
+        type:String
     },
     description :{
         type: String
     },
-    user :{
+    user :[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Owner'
-    },
+        ref:'User'
+    }],
+    task:[{
+        type:mongoose.Schema.Types.ObjectId,ref:'Task'
+    }]
+   
     /*Created:{
         type:Date, default:Date.now
     },

@@ -15,5 +15,7 @@ mongoose.connect('mongodb://localhost/EO',{
 
 // routes
 app.use(require('./app/routes'));
-
+app.set('view engine','ejs');
+                                                                                                                                                        
 app.listen(3000, () => console.log('server on!'));
+

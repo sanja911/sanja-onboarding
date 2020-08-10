@@ -1,27 +1,28 @@
-var mongoose = require('mongoose');
-var moment = require('moment');
-const User=mongoose.model("User",
-new mongoose.Schema({  
-    name: String,
-    username:String,
-    email:String,
-    created: {type: Date, default: Date.now},
-    updated: {type: Date, default: Date.now},
-    organization:[
-        {   
-        type: mongoose.Schema.Types.ObjectId,
-        name:String,
-        ref: "Owner"
-        }
-    ],
-    project:[
-        {
-        type: mongoose.Schema.Types.ObjectId,
-        name:String,
-        ref: "Project" 
-        }
-    ]
-}));
+const mongoose = require('mongoose');
+const UserSchema = new mongoose.Schema({
+    name :{
+        type:String,
+        
+    },
+    username: {
+        type:String,
+    },
+    email: {
+        Type:String,
+    },
+    password: {
+        Type:String,
+    },
 
-//moment().format(); 
-module.exports = User; 
+    project : [
+        {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
+    ],
+    user_id : [
+        {type: mongoose.Schema.Types.ObjectId,ref:'User'}
+    ],
+  
+},{
+    timestamps: true
+})
+
+module.exports = mongoose.model('User',UserSchema);

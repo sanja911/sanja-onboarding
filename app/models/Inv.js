@@ -9,7 +9,7 @@ const InvSchema = new mongoose.Schema({
     },
     id_user: {
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Owner'
+        ref:'User'
     } 
 },{
     timestamps: true
