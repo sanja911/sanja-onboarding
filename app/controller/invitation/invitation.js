@@ -1,5 +1,5 @@
 const Post = require('../../models/Inv');
-const User = require('../../models/Owner');
+const User = require('../../models/organization');
 
 module.exports = {
     create : async (req, res) => {
@@ -23,7 +23,7 @@ module.exports = {
     },
     userByPost : async (req,res)=>{
         const { id } = req.params;
-        const userByPost = await Post.findById(id).populate('owner');
+        const userByPost = await Post.findById(id).populate('organization');
         res.send(userByPost);
     }
 }

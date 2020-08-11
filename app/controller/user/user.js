@@ -7,7 +7,7 @@ module.exports = {
             name,
             username,
             email,
-            password
+            password,
         });
 
         return res.send(user)
@@ -17,24 +17,28 @@ module.exports = {
        const { id } = req.params;
        const proj = await User.findById(id).populate('project');
        const { id1 }=req.params;
-       const  user = await User.findById(id1).populate('owner'); 
+       const  user = await User.findById(id1).populate('organization'); 
        res.send(proj.project);
        res.send(user.organization);
 
     },
     find : async (req, res) => {
-        const user = await User.find()
+        const { id }=req.params;
+        const user = await User.findById(id)
         return res.send(user)
     },
-    update : async (req,res)=>{
+    update : async (req,res,next)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        const userByPost = await User.findById(id).update({
+        User.findById(id).update({
             name,
             username,
             email,
             password
+        },function(err,post){
+            if(err) return next(err);
+            res.json({message:'Data Successful Updated'})
         });
-        res.send(userByPost);
+   
     }
 }

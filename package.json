@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "ignore": [
+      "* .json"
+    ]
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -16,12 +19,14 @@
     "errorhandler": "^1.5.1",
     "express": "^4.16.4",
     "express-session": "^1.17.1",
+    "hbs": "^4.1.1",
     "http-errors": "~1.6.3",
     "jade": "^1.11.0",
     "jquery": "^3.5.1",
     "method-override": "^3.0.0",
     "moment": "^2.27.0",
     "mongoose": "^5.9.27",
+    "mongoose-deep-populate": "^3.2.0",
     "morgan": "^1.9.1",
     "node-uuid": "^1.4.8",
     "seneca": "^3.22.0",
@@ -29,6 +34,7 @@
     "seneca-entity": "^10.0.2",
     "seneca-entity-crud": "^1.7.3",
     "serve-favicon": "^2.5.0",
+    "splice": "^1.0.0",
     "winston": "^3.3.3"
   }
 }

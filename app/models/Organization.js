@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const OwnerSchema = new mongoose.Schema({
+const organizationSchema = new mongoose.Schema({
     name :{
         type:String,
         
@@ -17,9 +17,9 @@ const OwnerSchema = new mongoose.Schema({
     updated: {
         type: Date, default: Date.now
     },*/       
-    project : [
+    /*project : [
         {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],
+    ],*/
     user_id : [
         {type: mongoose.Schema.Types.ObjectId,ref:'User'}
     ],
@@ -30,4 +30,4 @@ const OwnerSchema = new mongoose.Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model('Owner',OwnerSchema);
+module.exports = mongoose.model('organization',organizationSchema);

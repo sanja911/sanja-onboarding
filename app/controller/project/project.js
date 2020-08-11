@@ -1,6 +1,6 @@
 const Post = require('../../models/Project');
-const User = require('../../models/Owner');
 const Users = require('../../models/User');
+const { NotExtended } = require('http-errors');
 const post=new Post()
 module.exports = {
     create : async (req, res) => {
@@ -25,17 +25,38 @@ module.exports = {
     },
 
     find : async (req, res) => {
-        const user = await Post.find()
+        const {id}=req.params;
+        const user = await Post.findById(id);
         return res.send(user)
     },
-    update : async (req,res)=>{
+    update : async (req,res, next)=>{
         const { id } = req.params;
         const {proj_name,description}=req.body;
-        const userByPost = await Post.findById(id).update({
+        Post.findById(id).update({
             proj_name,
             description,
             user:id,
-        });
-        res.send(userByPost);
-    }
+        },function(err,post){
+            if(err) return next(err);
+            res.json({message:'Data Successful Updated'})
+        })
+    },
+   
+  /*  delete : async (req, res, next) => {
+        const {id}=req.params;
+        const found= await Users.findById(id)
+        const index= id.indexOf();
+        const splice= id.splice (index,0,found);
+      //  console.log(id)
+       Users.findById(id).update({
+            project:splice
+
+           
+       },function(err,post){
+        if(err) return next(err);
+        res.json({message:'Data Successful Updated'})
+    })
+    
+         
+    },*/
 }

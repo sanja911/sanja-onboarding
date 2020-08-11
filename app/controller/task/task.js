@@ -27,13 +27,14 @@ module.exports = {
         return res.send(userById);
     },
     find : async (req, res) => {
-        const user = await Task.find()
+        const { id } = req.params;
+        const user = await Task.findById(id)
         return res.send(user)
     },
-    update : async (req,res)=>{
+    update : async (req,res,next)=>{
         const { id } = req.params;
         const { summary, description, created_by,due_date,status,assignee}=req.body;
-        const userByPost = await Task.findById(id).update({
+       Task.findById(id).update({
             project:id,
             summary,
             description,
@@ -41,7 +42,9 @@ module.exports = {
             due_date,
             status,
             assignee
-        });
-        res.send(userByPost);
+        },function(err,post){
+            if(err) return next(err);
+            res.json({message:'Data Successful Updated'})
+        })
     }
 }
