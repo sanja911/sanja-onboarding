@@ -19,7 +19,7 @@ const OrgSchema = new mongoose.Schema({
     },*/       
     /*project : [
         {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],*/
+    ],*/ 
     user_id : [
         {type: mongoose.Schema.Types.ObjectId,ref:'User'}
     ],
@@ -30,4 +30,4 @@ const OrgSchema = new mongoose.Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model('organization',OrgSchema);
+module.exports = mongoose.model('Organization',OrgSchema); 

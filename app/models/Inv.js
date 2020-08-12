@@ -5,10 +5,12 @@ const InvSchema = new mongoose.Schema({
         type:Date,default:Date.now
         
     },
-    id_user: {
+    id_user:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
-    } 
+    }]
+        
+    
 },{
     timestamps: true
 })

@@ -1,6 +1,6 @@
 const User = require('../../models/User');
 const Proj = require('../../models/Project');
-const Org  = require('../../models/organization');
+const Org  = require('../../models/Organizaton');
 
 module.exports = {
     create : async (req, res) =>{

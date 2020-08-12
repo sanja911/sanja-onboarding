@@ -11,7 +11,8 @@ const ProjSchema = new mongoose.Schema({
         ref:'User'
     }],
     task:[{
-        type:mongoose.Schema.Types.ObjectId,ref:'Task'
+        type:mongoose.Schema.Types.ObjectId
+        ,ref:'Task'
     }]
    
     /*Created:{
