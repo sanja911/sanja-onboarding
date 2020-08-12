@@ -46,5 +46,23 @@ module.exports = {
             if(err) return next(err);
             res.json({message:'Data Successful Updated'})
         })
+    },
+    delete : async (req,res)=>{
+        const{id}=req.params;
+        Project.find({task:id}).updateOne({
+            $pull:{task:id}
+        },function(err){
+            if(err){
+                res.send(err)
+            }else{
+                Task.findByIdAndDelete(id, function(err,result){
+                    if(err){
+                        res.send(err)
+                    }else{
+                        res.send(result);
+                    }
+                })
+            }
+        })
     }
 }

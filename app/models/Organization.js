@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const organizationSchema = new mongoose.Schema({
+const OrgSchema = new mongoose.Schema({
     name :{
         type:String,
         
     },
     user: {
         type:String,
-        enum : ['Organization','Manager', 'Member'],
+        enum : ['Owner','Manager', 'Member'],
         default: 'Member'
     },
 
@@ -25,9 +25,9 @@ const organizationSchema = new mongoose.Schema({
     ],
     inv_id :[
         {type:mongoose.Schema.Types.ObjectId,ref:'Inv'}
-    ]
+    ] 
 },{
     timestamps: true
 })
 
-module.exports = mongoose.model('organization',organizationSchema);
+module.exports = mongoose.model('organization',OrgSchema);

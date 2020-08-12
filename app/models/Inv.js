@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const InvSchema = new mongoose.Schema({
-    description:{
-        type:String
-    },
+    
     inv_date :{
         type:Date,default:Date.now
         

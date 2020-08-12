@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
     org_id:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Organization'
+    }],
+    inv_id:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Inv'
     }]
    
     /*Created:{

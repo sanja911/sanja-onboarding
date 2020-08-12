@@ -42,21 +42,22 @@ module.exports = {
         })
     },
    
-  /*  delete : async (req, res, next) => {
+   delete : async (req, res, next) => {
         const {id}=req.params;
-        const found= await Users.findById(id)
-        const index= id.indexOf();
-        const splice= id.splice (index,0,found);
-      //  console.log(id)
-       Users.findById(id).update({
-            project:splice
-
-           
-       },function(err,post){
-        if(err) return next(err);
-        res.json({message:'Data Successful Updated'})
-    })
-    
-         
-    },*/
+        Users.find({project:id}).updateOne({
+            $pull:{project:id}
+        },function(err){
+            if(err){
+                res.send(err)
+            }else{
+                Post.findByIdAndDelete(id ,function(err,result){
+                    if(err){
+                        res.send(err)
+                    }else{
+                        res.send(result)
+                    }
+                })
+            }
+        } );
+    }  
 }

@@ -1,4 +1,6 @@
 const User = require('../../models/User');
+const Proj = require('../../models/Project');
+const Org  = require('../../models/organization');
 
 module.exports = {
     create : async (req, res) =>{
@@ -40,5 +42,32 @@ module.exports = {
             res.json({message:'Data Successful Updated'})
         });
    
+    },
+    delete : async (req, res, next) => {
+        const {id}=req.params;
+        Org.find({user_id:id}).deleteOne({
+            user_id:id}
+         ,function(err){
+            if(err){
+                res.send(err)
+            }else{
+                User.findByIdAndDelete(id ,function(err){
+                    if(err){
+                        res.send(err)
+                    }else{
+                       Proj.find({user:id}).deleteOne({
+                           user:id
+                       },function (err,result){
+                           if(err){
+                               res.send(err)
+                           }else{
+                               res.send(result)
+                           }
+
+                       })
+                    }
+                })
+            }
+        } )
     }
-}
+    }  

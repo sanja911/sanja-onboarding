@@ -17,11 +17,12 @@ app.use(methodOverride());
 router.post('/organization/create/:id',User.create);
 router.post('/organization/find/:id',User.find);
 router.post('/organization/update/:id', User.update);
+router.get('/organization/delete/:id',User.delete);
 // project routes
-router.post('/project/create/:id',Post.create);
-router.post('/project/populate/:id',Post.update);
-router.post('/project/find/:id',Post.find);
-//router.post('/project/delete/:id', Post.delete);
+router.get('/project/create/:id',Post.create);
+router.get('/project/populate/:id',Post.update);
+router.get('/project/find/:id',Post.find);
+router.get('/project/delete/:id', Post.delete);
 // inv routes
 router.post('/invitation/create/:id', Inv.create);
 router.post('/invitation/populate/:id',Inv.userByPost);
@@ -29,10 +30,12 @@ router.post('/invitation/populate/:id',Inv.userByPost);
 router.post('/task/create/:id',Task.create);
 router.post('/task/find/:id',Task.find);
 router.post('/task/populate/:id',Task.update);
+router.get('/task/delete/:id',Task.delete);
 //user routes
 router.post('/user/create',Users.create);
-router.post('/user/find/:id',Users.find);
-router.post('/user/populate/:id',Users.update);
+router.get('/user/find/:id',Users.find);
+router.get('/user/populate/:id',Users.update);
+router.get('/user/delete/:id',Users.delete);
 //Views
 app.get("/",function(request,resolve){
     resolve.render("index")

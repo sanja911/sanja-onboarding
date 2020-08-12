@@ -14,7 +14,6 @@ module.exports = {
         })
         await organization.save();
         const userById = await User1.findById(id);
-        
         userById.org_id.push(organization);
         await userById.save();
         return res.send(userById);
@@ -36,12 +35,25 @@ module.exports = {
             res.json({message:'Data Successful Updated'})
         });
    
-    }
+    },
 
-   /* userByPost : async (req,res)=>{
-        const { id } = req.params;
-        const userByPost = await User1.findById(id).populate('user');
-        res.send(userByPost);
-    }*/
+  delete: async(req,res) => {
+    const {id}=req.params;
+    User1.find({org_id:id}).updateOne({
+        $pull:{org_id:id}
+    },function(err){
+        if(err){
+            res.send(err)
+        }else{
+            User.findByIdAndDelete(id, function(err,result){
+                if(err){
+                    res.send(err)
+                }else{
+                    res.send(result)
+                }
+            });
+        }
+    })
+  }
 
 }
