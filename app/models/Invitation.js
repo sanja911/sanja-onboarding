@@ -15,4 +15,4 @@ const InvSchema = new mongoose.Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model('Inv',InvSchema);
+module.exports = mongoose.model('Invitation',InvSchema);

@@ -1,4 +1,4 @@
-const Inv = require('../models/Inv');
+const Invitation = require('../models/Invitation');
 const User = require('../models/User');
 const Organizaton = require('../models/Organizaton');
 module.exports = {
@@ -8,12 +8,12 @@ module.exports = {
         //users = req.params;
         //id = users.id;
         //const { user_id}=req.body;
-        const { id,name,user,user_id} = req.body;
-        const post = await Inv.create({
+        const { id,name,user} = req.body;
+        const post = await Invitation.create({
             id,
 
         });
-        const us=await Organizaton.create({
+        const us = await Organizaton.create({
             name,
             user,
             id
