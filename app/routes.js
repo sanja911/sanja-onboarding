@@ -10,20 +10,20 @@ const Users = require('./controller/user');
 
 
 // own routes
-router.post('/organization/:id',Organization.create);
+router.post('/organization/',Organization.create);
 router.get('/organization/:id',Organization.find);
 router.put('/organization/:id',Organization.update);
 router.delete('/organization/:id',Organization.delete);
 // project routes
-router.post('/project/:id',Project.create);
+router.post('/project/',Project.create);
 router.put('/project/:id',Project.update);
 router.get('/project/:id' ,Project.find);
 router.delete('/project/:id', Project.delete);
 // inv routes
-router.post('/invitation/:id', Invitation.create);
+router.post('/invitation/', Invitation.create);
 //router.post('/invitation/populate/:id',Inv.userByPost);
 //task routes 
-router.post('/task/:id',Task.create); 
+router.post('/task/',Task.create); 
 router.get('/task/:id',Task.find);
 router.put('/task/:id',Task.update); 
 router.delete('/task/:id',Task.delete);

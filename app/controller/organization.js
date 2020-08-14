@@ -2,11 +2,11 @@ const Organizaton = require('../models/Organizaton');
 const User = require('../models/User');
 module.exports = {
     create : async (req, res) =>{
-        const { name, user } = req.body;
-        user_id=req.params;
-        id=user_id.id;
+        const { id,name, user } = req.body;
+        //user_id=req.params;
+        //id=user_id.id;
         const organization = await User.create({
-            user_id:id,
+            id,
             name,
             user
         })

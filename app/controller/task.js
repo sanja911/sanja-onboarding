@@ -5,11 +5,11 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-        project = req.params;
-        id = project.id;
-        const { summary, description, created_by,due_date,status,assignee} = req.body;
+       // project = req.params;
+       // id = project.id;
+        const { id,summary, description, created_by,due_date,status,assignee} = req.body;
         const post = await Task.create({
-            project:id,
+            id,
             summary,
             description,
             created_by,

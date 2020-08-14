@@ -7,15 +7,15 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-        user = req.params;
-        organization=req.params;
-        id = user.id;
+       // user = req.params;
+       // organization=req.params;
+       // id = user.id;
 
-        const { proj_name, description} = req.body;
+        const { id,proj_name, description} = req.body;
         const post = await Project.create({
             proj_name,
             description,
-            user:id,
+            id,
         });
         await post.save();
 
