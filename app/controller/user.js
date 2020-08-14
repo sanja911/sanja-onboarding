@@ -42,7 +42,7 @@ module.exports = {
     },
     delete : async (req) => {
         const {id}=req.params;
-        var Delete = new Promise((resolve,reject)=>{
+       new Promise((resolve,reject)=>{
             Organization.find({user_id:id}).deleteOne({
                 user_id:id},(err)=>{
                     if(err) reject(err);
@@ -52,7 +52,6 @@ module.exports = {
                 }) 
         })
     })
-    Delete
         .then(res=>console.log('Data: ', res))
         .catch(err=>console.log('error :',err))
 }

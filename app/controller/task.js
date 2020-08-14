@@ -49,7 +49,7 @@ module.exports = {
     },
     delete : async (req,res)=>{
         const{id}=req.params;
-        var Del= new Promise((resolve,reject)=>{
+        new Promise((resolve,reject)=>{
             Project.find({task:id}).updateOne({
                 $pull:{task:id}},(err)=>{
                     if(err) reject(err);
@@ -58,8 +58,7 @@ module.exports = {
                         resolve(res);
                 });
         })
-    });
-    Del
+    })
     .then(res=>console.log('Data :',res))
     .catch(err=>console.log('Error! ',err))
       

@@ -37,7 +37,7 @@ module.exports = {
 
   delete: async(req) => {
     const {id}=req.params;
-    var dataDelete= new Promise((resolve,reject)=>{
+    new Promise((resolve,reject)=>{
         Organizaton.find({org_id:id}).updateOne({$pull:{org_id:id}},(err)=>{
             if (err) reject(err);
             User.findByIdAndDelete(id, (err,res)=>{
@@ -46,7 +46,6 @@ module.exports = {
         });
     })
   })
-  dataDelete
   .then(res=>console.log('Data :',res ,'Successful Delete'))
   .catch(err=>console.log('error :',err))
 }
