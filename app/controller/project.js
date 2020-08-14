@@ -18,7 +18,6 @@ module.exports = {
             id,
         });
         await post.save();
-
         const userByUser= await Users.findById(id)
         userByUser.project.push(post);
         await userByUser.save();
@@ -44,9 +43,8 @@ module.exports = {
     },
 
     delete : async (req) => {
-        const {id}=req.params;
-       
-        var deleteData= new Promise((resolve,reject)=>{
+       const {id}=req.params;
+       new Promise((resolve,reject)=>{
            Users.find({project:id}).updateOne({$pull:{project:id}},(err)=>{
                 if(err) reject(err);
                 Project.findByIdAndDelete(id,(err,res)=>{
@@ -54,10 +52,9 @@ module.exports = {
                     resolve(res)
                 });  
            });
-        });
-        deleteData
-            .then(res=>console.log('Data :',res))
-            .catch(err=>console.log('error',err))
+        })
+          .then(res=>console.log('Data :',res))
+          .catch(err=>console.log('error',err))
         }
        }
             

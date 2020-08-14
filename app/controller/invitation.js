@@ -2,7 +2,7 @@ const Inv = require('../models/Inv');
 const User = require('../models/User');
 const Organizaton = require('../models/Organizaton');
 module.exports = {
-    create : async (req, res) => {
+    create : async (req, res, err) => {
 
         console.log(req.params);
         //users = req.params;
@@ -11,12 +11,11 @@ module.exports = {
         const { id,name,user,user_id} = req.body;
         const post = await Inv.create({
             id,
-          //user_id
+
         });
         const us=await Organizaton.create({
             name,
             user,
-            //user_id,
             id
         })
 
@@ -24,6 +23,7 @@ module.exports = {
         const userById = await User.findById(id);
         userById.inv_id.push(post);       
         await userById.save();
+        if(err) console.log('Error Detected!', err);
         return res.send(userById);
         
     },

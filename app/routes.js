@@ -33,4 +33,5 @@ router.get('/user/:id',Users.find);
 router.put('/user/:id',Users.update);
 router.delete('/user/:id',Users.delete);
 //Views
+
 module.exports = router;

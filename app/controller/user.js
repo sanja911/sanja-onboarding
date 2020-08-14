@@ -18,6 +18,7 @@ module.exports = {
         const { id }=req.params;
         const user = await User.findById(id)
         return res.send(user)
+        
     },
     
     view : async (res,req) => {

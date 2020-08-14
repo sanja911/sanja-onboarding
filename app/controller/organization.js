@@ -28,7 +28,7 @@ module.exports = {
         Organizaton.findById(id).update({
             name,
             user,
-        },function(err,post){
+        },function(err){
             if(err) return next(err);
             res.json({message:'Data Successful Updated'})
         });
