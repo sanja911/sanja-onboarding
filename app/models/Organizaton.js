@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const OrgSchema = new mongoose.Schema({
+const OrganizattionSchema = new mongoose.Schema({
     name :{
         type:String,
         
@@ -22,12 +22,9 @@ const OrgSchema = new mongoose.Schema({
     ],*/ 
     user_id : [
         {type: mongoose.Schema.Types.ObjectId,ref:'User'}
-    ],
-    inv_id :[
-        {type:mongoose.Schema.Types.ObjectId,ref:'Inv'}
-    ] 
+    ]
 },{
     timestamps: true
 })
 
-module.exports = mongoose.model('Organization',OrgSchema); 
+module.exports = mongoose.model('Organization',OrganizattionSchema); 

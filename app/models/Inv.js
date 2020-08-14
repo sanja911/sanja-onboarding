@@ -5,7 +5,7 @@ const InvSchema = new mongoose.Schema({
         type:Date,default:Date.now
         
     },
-    id_user:[{
+    user_id:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     }]

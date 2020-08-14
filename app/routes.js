@@ -1,41 +1,36 @@
 const express = require('express');
 const app = express();
 var path=require('path');
-const hbs=require('hbs');
 const router = new express.Router;
-const User = require('./controller/organization/organization');
-const Post = require('./controller/project/project');
-const Inv = require('./controller/invitation/invitation');
-const Task = require('./controller/task/task');
-const Users = require('./controller/user/user');
-app.set('view engine','hbs');
-app.use(express.static('public'));
-app.set('views' ,path.join(__dirname,'views'));
+const Organization = require('./controller/organization');
+const Project = require('./controller/project');
+const Invitation = require('./controller/invitation');
+const Task = require('./controller/task');
+const Users = require('./controller/user');
+
+
 // own routes
-router.post('/organization/create/:id',User.create);
-router.post('/organization/find/:id',User.find);
-router.get('/organization/update/:id', User.update);
-router.get('/organization/delete/:id',User.delete);
+router.post('/organization/:id',Organization.create);
+router.get('/organization/:id',Organization.find);
+router.put('/organization/:id',Organization.update);
+router.delete('/organization/:id',Organization.delete);
 // project routes
-router.get('/project/create/:id',Post.create);
-router.get('/project/update/:id',Post.update);
-router.get('/project/find/:id' ,Post.find);
-router.get('/project/delete/:id', Post.delete);
+router.post('/project/:id',Project.create);
+router.put('/project/:id',Project.update);
+router.get('/project/:id' ,Project.find);
+router.delete('/project/:id', Project.delete);
 // inv routes
-router.post('/invitation/create/:id', Inv.create);
+router.post('/invitation/:id', Invitation.create);
 //router.post('/invitation/populate/:id',Inv.userByPost);
-//task routes
-router.post('/task/create/:id',Task.create); 
-router.post('/task/find/:id',Task.find);
-router.post('/task/edit/:id',Task.update);
-router.get('/task/delete/:id',Task.delete);
+//task routes 
+router.post('/task/:id',Task.create); 
+router.get('/task/:id',Task.find);
+router.put('/task/:id',Task.update); 
+router.delete('/task/:id',Task.delete);
 //user routes
-router.post('/user/create',Users.create);
-router.get('/user/find/:id',Users.find);
-router.get('/user/edit/:id',Users.update);
-router.get('/user/delete/:id',Users.delete);
+router.post('/user/',Users.create);
+router.get('/user/:id',Users.find);
+router.put('/user/:id',Users.update);
+router.delete('/user/:id',Users.delete);
 //Views
-app.get("/",function(request,resolve){
-    resolve.render("index")
-}),
 module.exports = router;
