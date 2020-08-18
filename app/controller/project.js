@@ -29,6 +29,14 @@ module.exports = {
         const user = await Project.findById(id);
         return res.send(user)
     },
+    findAll: async()=>{
+        new Promise((resolve,reject)=>{
+            Project.find(function(err,res){
+                if(err) reject(err)
+                resolve(res);
+            })
+        })
+    },
     update : async (req,res, next)=>{
         const { id } = req.params;
         const {proj_name,description}=req.body;

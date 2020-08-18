@@ -7,8 +7,6 @@ const Project = require('./controller/project');
 const Invitation = require('./controller/invitation');
 const Task = require('./controller/task');
 const Users = require('./controller/user');
-
-
 // own routes
 router.post('/organization/',Organization.create);
 router.get('/organization/:id',Organization.find);
@@ -18,10 +16,11 @@ router.delete('/organization/:id',Organization.delete);
 router.post('/project/',Project.create);
 router.put('/project/:id',Project.update);
 router.get('/project/:id' ,Project.find);
+router.get('/project/',Project.findAll);
 router.delete('/project/:id', Project.delete);
 // inv routes
 router.post('/invitation/', Invitation.create);
-//router.post('/invitation/populate/:id',Inv.userByPost);
+router.get('/invitation/',Invitation.find);
 //task routes 
 router.post('/task/',Task.create); 
 router.get('/task/:id',Task.find);

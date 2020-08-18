@@ -1,18 +1,27 @@
 const User = require('../models/User');
 //const Project = require('../models/Project');
 const Organization  = require('../models/Organizaton');
-
+const bcrypt = require('bcryptjs');
+const jwt = require ('jsonwebtoken')
 module.exports = {
-    create : async (req, res) =>{
-        const { name,username,email,password } = req.body;
-        const user = await User.create({
-            name,
-            username,
-            email,
-            password,
-        });
-
-        return res.send(user)
+    create : async (req) =>{
+        new Promise((resolve,reject)=>{
+            bcrypt.hash(req.body.password,10, (err,hash)=>{ 
+             if(err) reject(err);
+             const { name,username,email } = req.body;
+             User.create({ 
+                 name,
+                 username,
+                 email,
+                 password:hash
+             },(err,res)=>{
+                 if(err) reject(err)
+                 resolve(res)
+             });
+            })
+        })
+        .then(res=>console.log('Data :',res))
+        .catch(err=>console.log('Error !',err))
     },
     find : async (req, res) => {
         const { id }=req.params;
