@@ -16,11 +16,11 @@ const UserSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Project'
     }],
-    org_id:[{
+    orgId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Organization'
     }],
-    inv_id:[{
+    invId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Inv'
     }]

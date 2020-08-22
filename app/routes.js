@@ -10,6 +10,7 @@ const Users = require('./controller/user');
 // own routes
 router.post('/organization/',Organization.create);
 router.get('/organization/:id',Organization.find);
+router.get('/organization/',Organization.findAll);
 router.put('/organization/:id',Organization.update);
 router.delete('/organization/:id',Organization.delete);
 // project routes

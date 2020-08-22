@@ -1,6 +1,6 @@
 const User = require('../models/User');
 //const Project = require('../models/Project');
-const Organization  = require('../models/Organizaton');
+const Organization  = require('../models/Organization');
 const bcrypt = require('bcryptjs');
 const jwt = require ('jsonwebtoken')
 module.exports = {
@@ -51,17 +51,16 @@ module.exports = {
     },
     delete : async (req) => {
         const {id}=req.params;
-       new Promise((resolve,reject)=>{
+       new Promise((resolve)=>{
             Organization.find({user_id:id}).deleteOne({
-                user_id:id},(err)=>{
-                    if(err) reject(err);
-                    User.findByIdAndDelete(id,(err,res)=>{
-                        if(err) reject(err);
-                        resolve(res);
-                }) 
-        })
-    })
+                user_id:id},(res)=>{                   
+                       resolve(res);
+                })
+         })
         .then(res=>console.log('Data: ', res))
         .catch(err=>console.log('error :',err))
+        .then(del=>User.findByIdAndDelete(id,()=>{
+            return del;
+        }))
 }
 }

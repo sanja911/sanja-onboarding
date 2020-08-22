@@ -1,31 +1,36 @@
-const Organizaton = require('../models/Organizaton');
+const Organization = require('../models/Organization');
 const User = require('../models/User');
+
 module.exports = {
     create : async (req, res) =>{
-        const { id,name, user } = req.body;
-        //user_id=req.params;
-        //id=user_id.id;
-        const organization = await User.create({
-            id,
+        const { userId,name, user } = req.body;
+      
+        const organization = await Organization.create({
+            userId,
             name,
             user
         })
-        await organization.save();
-        const userById = await Organizaton.findById(id);
-        userById.org_id.push(organization);
+  
+        const userById = await User.findById(userId);
+        userById.orgId.push(organization);
         await userById.save();
         return res.send(userById);
     },
 
     find : async (req, res) => {
         const { id } = req.params;
-        const user = await Organizaton.findById(id)
+        const user = await Organization.findById(id)
         return res.send(user)
+    },
+    
+    findAll : async(res)=>{
+        const finds = await Organization.find();
+        console.log('Data :', res)
     },
     update : async (req,res,next)=>{
         const { id } = req.params;
         const { name, user }=req.body;
-        Organizaton.findById(id).update({
+        Organization.findById(id).update({
             name,
             user,
         },function(err){
@@ -37,16 +42,15 @@ module.exports = {
 
   delete: async(req) => {
     const {id}=req.params;
-    new Promise((resolve,reject)=>{
-        Organizaton.find({org_id:id}).updateOne({$pull:{org_id:id}},(err)=>{
-            if (err) reject(err);
-            User.findByIdAndDelete(id, (err,res)=>{
-                if(err) reject(err)
-                resolve(res)
-        });
+    new Promise((resolve)=>{
+        User.find({orgId:id}).updateOne({$pull:{orgId:id}},(res)=>{
+         resolve(res)
     })
   })
   .then(res=>console.log('Data :',res ,'Successful Delete'))
   .catch(err=>console.log('error :',err))
+  .then(del=>Organization.findByIdAndDelete(id,() =>{
+  return del;
+  }))
 }
 }

@@ -2,9 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-//const Users = require('./app/controller/user')
+// /const Users = require('./app/controller/user')
 const app = express();
-
 // middlewares
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));

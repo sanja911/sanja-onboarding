@@ -7,19 +7,17 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-       // user = req.params;
-       // organization=req.params;
-       // id = user.id;
+    
 
-        const { id,proj_name, description} = req.body;
-        const post = await Project.create({
-            proj_name,
+        const { id,projName, description} = req.body;
+        const projects = await Project.create({
+            projName,
             description,
             id,
         });
-        await post.save();
+       // await post.save();
         const userByUser= await Users.findById(id)
-        userByUser.project.push(post);
+        userByUser.project.push(projects);
         await userByUser.save();
         return res.send(userByUser); 
     },
@@ -39,9 +37,9 @@ module.exports = {
     },
     update : async (req,res, next)=>{
         const { id } = req.params;
-        const {proj_name,description}=req.body;
+        const {projName,description}=req.body;
         Project.findById(id).update({
-            proj_name,
+            projName,
             description,
             user:id,
         },(err)=>{
@@ -52,17 +50,16 @@ module.exports = {
 
     delete : async (req) => {
        const {id}=req.params;
-       new Promise((resolve,reject)=>{
-           Users.find({project:id}).updateOne({$pull:{project:id}},(err)=>{
-                if(err) reject(err);
-                Project.findByIdAndDelete(id,(err,res)=>{
-                    if(err) reject(err);
+       new Promise((resolve)=>{
+           Users.find({project:id}).updateOne({$pull:{project:id}},(res)=>{
                     resolve(res)
-                });  
-           });
-        })
+                })
+           })
           .then(res=>console.log('Data :',res))
           .catch(err=>console.log('error',err))
+          .then(del=>Project.findByIdAndDelete(id,()=>{
+              return del;
+          }))
         }
        }
             

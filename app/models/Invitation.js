@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const InvSchema = new mongoose.Schema({
     
-    inv_date :{
+    invDate :{
         type:Date,default:Date.now
         
     },
-    user_id:[{
+    userId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     }]},

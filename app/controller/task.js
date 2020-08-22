@@ -7,39 +7,39 @@ module.exports = {
         console.log(req.params);
        // project = req.params;
        // id = project.id;
-        const { id,summary, description, created_by,due_date,status,assignee} = req.body;
-        const post = await Task.create({
+        const { id,summary, description, createdBy,dueDate,status,assignee} = req.body;
+        const tasks = await Task.create({
             id,
             summary,
             description,
-            created_by,
-            due_date,
+            createdBy,
+            dueDate,
             status,
             assignee
         });
-        await post.save();
-
         const userById = await Project.findById(id);
-
-        userById.task.push(post);
+        userById.task.push(tasks);
         await userById.save();
-
         return res.send(userById);
     },
     find : async (req, res) => {
         const { id } = req.params;
-        const user = await Task.findById(id)
-        return res.send(user)
+        const task = await Task.findById(id)
+        return res.send(task)
+    },
+    findAll: async(res) => {
+        const task = await Task.find()
+        return res.send(task) 
     },
     update : async (req,res,next)=>{
         const { id } = req.params;
-        const { summary, description, created_by,due_date,status,assignee}=req.body;
+        const { summary, description, createdBy,dueDate,status,assignee}=req.body;
        Task.findById(id).update({
             project:id,
             summary,
             description,
-            created_by,
-            due_date,
+            createdBy,
+            dueDate,
             status,
             assignee
         },(err)=>{
@@ -47,20 +47,18 @@ module.exports = {
             res.json({message:'Data Successful Updated'})
         })
     },
-    delete : async (req,res)=>{
+    delete : async (req)=>{
         const{id}=req.params;
-        new Promise((resolve,reject)=>{
+        new Promise((resolve)=>{
             Project.find({task:id}).updateOne({
-                $pull:{task:id}},(err)=>{
-                    if(err) reject(err);
-                    Task.findByIdAndDelete(id,(err,res)=>{
-                        if(err) reject(err);
-                        resolve(res);
-                });
+                $pull:{task:id}},(res)=>{
+                    resolve(res);
         })
-    })
-    .then(res=>console.log('Data :',res))
-    .catch(err=>console.log('Error! ',err))
-      
+       .then(res=>console.log('Data :', res))
+       .catch(err=>console.log('error ',err))
+       .then(del=>Task.findByIdAndDelete(id,()=>{
+        return del;
+       }))
+        })
     }
 }

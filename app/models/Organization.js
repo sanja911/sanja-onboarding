@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const OrganizattionSchema = new mongoose.Schema({
+const OrganizationSchema = new mongoose.Schema({
     name :{
         type:String,
         
@@ -20,11 +20,11 @@ const OrganizattionSchema = new mongoose.Schema({
     /*project : [
         {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
     ],*/ 
-    user_id : [
+    userId : [
         {type: mongoose.Schema.Types.ObjectId,ref:'User'}
     ]
 },{
     timestamps: true
 })
 
-module.exports = mongoose.model('Organization',OrganizattionSchema); 
+module.exports = mongoose.model('Organization',OrganizationSchema); 

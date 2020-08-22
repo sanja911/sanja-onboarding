@@ -1,6 +1,6 @@
 const mongoose  = require('mongoose');
 const ProjSchema = new mongoose.Schema({
-    proj_name:{
+    projName:{
         type:String
     },
     description :{

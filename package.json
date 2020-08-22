@@ -9,6 +9,7 @@
     ]
   },
   "dependencies": {
+    "apollo-server-express": "^2.16.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.5.1",
@@ -19,7 +20,11 @@
     "ejs": "^2.6.2",
     "errorhandler": "^1.5.1",
     "express": "^4.16.4",
+    "express-graphql": "^0.11.0",
     "express-session": "^1.17.1",
+    "graphql": "^15.3.0",
+    "graphql-date": "^1.0.3",
+    "hapi": "^18.1.0",
     "hbs": "^4.1.1",
     "http-errors": "~1.6.3",
     "jade": "^1.11.0",
@@ -36,6 +41,7 @@
     "seneca-basic": "^1.0.0",
     "seneca-entity": "^10.0.2",
     "seneca-entity-crud": "^1.7.3",
+    "seneca-mongo-store": "^4.0.0",
     "serve-favicon": "^2.5.0",
     "splice": "^1.0.0",
     "winston": "^3.3.3"
