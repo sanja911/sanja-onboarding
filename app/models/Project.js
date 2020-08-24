@@ -1,6 +1,6 @@
 const mongoose  = require('mongoose');
 const ProjSchema = new mongoose.Schema({
-    proj_name:{
+    projName:{
         type:String
     },
     description :{
@@ -11,7 +11,8 @@ const ProjSchema = new mongoose.Schema({
         ref:'User'
     }],
     task:[{
-        type:mongoose.Schema.Types.ObjectId,ref:'Task'
+        type:mongoose.Schema.Types.ObjectId
+        ,ref:'Task'
     }]
    
     /*Created:{

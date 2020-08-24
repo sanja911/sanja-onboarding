@@ -1,28 +1,38 @@
-const mongoose = require('mongoose');
+const mongoose  = require('mongoose');
 const UserSchema = new mongoose.Schema({
-    name :{
-        type:String,
-        
+    name:{
+        type:String
     },
-    username: {
-        type:String,
+    username :{
+        type: String
     },
-    email: {
-        Type:String,
+    email :{
+        type: String
     },
-    password: {
-        Type:String,
+    password :{
+        type: String
     },
-
-    project : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],
-    user_id : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'User'}
-    ],
-  
+    project :[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Project'
+    }],
+    orgId:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Organization'
+    }],
+    invId:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Inv'
+    }]
+   
+    /*Created:{
+        type:Date, default:Date.now
+    },
+    Updated:{
+        type:Date, default:Date.now
+    }*/
 },{
-    timestamps: true
+    timestamps:true
 })
 
 module.exports = mongoose.model('User',UserSchema);

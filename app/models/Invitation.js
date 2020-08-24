@@ -1,18 +1,16 @@
 const mongoose = require('mongoose');
 const InvSchema = new mongoose.Schema({
-    description:{
-        type:String
-    },
-    inv_date :{
+    
+    invDate :{
         type:Date,default:Date.now
         
     },
-    id_user: {
+    userId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
-    } 
-},{
+    }]},
+{
     timestamps: true
 })
 
-module.exports = mongoose.model('Inv',InvSchema);
+module.exports = mongoose.model('Invitation',InvSchema);

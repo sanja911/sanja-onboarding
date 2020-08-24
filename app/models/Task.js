@@ -10,10 +10,10 @@ const TaskSchema = new mongoose.Schema({
         type: String
     },
   
-    created_by:{
+    createdBy:{
         type:String
     },
-    due_date:{
+    dueDate:{
         type:Date, default:Date.now
     },
     status:{

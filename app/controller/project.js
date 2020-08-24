@@ -1,0 +1,67 @@
+const Project = require('../models/Project');
+const Users = require('../models/User');
+const { NotExtended } = require('http-errors');
+
+//const post=new Post()
+module.exports = {
+    create : async (req, res) => {
+
+        console.log(req.params);
+    
+
+        const { id,projName, description} = req.body;
+        const projects = await Project.create({
+            projName,
+            description,
+            id,
+        });
+       // await post.save();
+        const userByUser= await Users.findById(id)
+        userByUser.project.push(projects);
+        await userByUser.save();
+        return res.send(userByUser); 
+    },
+
+    find : async (req, res) => {
+        const {id}=req.params;
+        const user = await Project.findById(id);
+        return res.send(user)
+    },
+    findAll: async()=>{
+        new Promise((resolve,reject)=>{
+            Project.find(function(err,res){
+                if(err) reject(err)
+                resolve(res);
+            })
+        })
+    },
+    update : async (req,res, next)=>{
+        const { id } = req.params;
+        const {projName,description}=req.body;
+        Project.findById(id).update({
+            projName,
+            description,
+            user:id,
+        },(err)=>{
+            if(err) return next(err);
+            res.json({message:'Data Successful Updated'})
+        })
+    },
+
+    delete : async (req) => {
+       const {id}=req.params;
+       new Promise((resolve)=>{
+           Users.find({project:id}).updateOne({$pull:{project:id}},(res)=>{
+                    resolve(res)
+                })
+           })
+          .then(res=>console.log('Data :',res))
+          .catch(err=>console.log('error',err))
+          .then(del=>Project.findByIdAndDelete(id,()=>{
+              return del;
+          }))
+        }
+       }
+            
+     
+    

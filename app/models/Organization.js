@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const OwnerSchema = new mongoose.Schema({
+const OrganizationSchema = new mongoose.Schema({
     name :{
         type:String,
         
     },
     user: {
         type:String,
-        enum : ['Organization','Manager', 'Member'],
+        enum : ['Owner','Manager', 'Member'],
         default: 'Member'
     },
 
@@ -17,17 +17,14 @@ const OwnerSchema = new mongoose.Schema({
     updated: {
         type: Date, default: Date.now
     },*/       
-    project : [
+    /*project : [
         {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],
-    user_id : [
+    ],*/ 
+    userId : [
         {type: mongoose.Schema.Types.ObjectId,ref:'User'}
-    ],
-    inv_id :[
-        {type:mongoose.Schema.Types.ObjectId,ref:'Inv'}
     ]
 },{
     timestamps: true
 })
 
-module.exports = mongoose.model('Owner',OwnerSchema);
+module.exports = mongoose.model('Organization',OrganizationSchema); 
