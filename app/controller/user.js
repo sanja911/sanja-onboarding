@@ -29,24 +29,21 @@ module.exports = {
         return res.send(user)
         
     },
-    
-    view : async (res,req) => {
-        const {id}=req.params;
-        const user = await User.findById(id) 
-        return res.send(user)
-    },
+
     update : async (req,res,next)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        User.findById(id).update({
-            name,
-            username,
-            email,
-            password 
-        },(err)=>{
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
-        });
+        new Promise((resolve)=>{
+            User.findById(id).update({
+                name,
+                username,
+                email,
+                password 
+            })
+            resolve(res)
+        })
+       .then(res=>res.json({message:'Data Successful Updated'}))
+       .catch(err=>console.log('Error ! :' ,err))
    
     },
     delete : async (req) => {

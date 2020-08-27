@@ -1,6 +1,7 @@
 const Invitation = require('../models/Invitation');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
+
 module.exports = {
     create : async (req, res, err) => {
 
@@ -22,7 +23,7 @@ module.exports = {
         userById.orgId.push(organization);       
         await userById.save();
         if(err) console.log('Error Detected!', err);
-        return res.send(userById);
+        return res.json(userById);
         
     },
     find : async(res)=>{

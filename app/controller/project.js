@@ -9,43 +9,41 @@ module.exports = {
         console.log(req.params);
     
 
-        const { id,projName, description} = req.body;
+        const { userid,projName, description,role} = req.body;
         const projects = await Project.create({
             projName,
+            role,
             description,
-            id,
+            userid,
         });
        // await post.save();
-        const userByUser= await Users.findById(id)
+        const userByUser= await Users.findById(userid)
         userByUser.project.push(projects);
         await userByUser.save();
-        return res.send(userByUser); 
+        return res.json(userByUser); 
     },
 
     find : async (req, res) => {
         const {id}=req.params;
         const user = await Project.findById(id);
-        return res.send(user)
+        return res.json(user)
     },
-    findAll: async()=>{
-        new Promise((resolve,reject)=>{
-            Project.find(function(err,res){
-                if(err) reject(err)
-                resolve(res);
-            })
-        })
+    findAll : async(req,res)=>{
+        const finds = await Project.find();
+        return res.json(finds);
     },
     update : async (req,res, next)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
-        Project.findById(id).update({
-            projName,
-            description,
-            user:id,
-        },(err)=>{
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
+        new Promise ((resolve)=>{
+            Project.findById(id).update({
+                projName,
+                description
+            })
+            resolve(res)
         })
+        .then(res=>res.json({message:'Data Successful Updated'}))
+        .catch(err=>console.log(err))
     },
 
     delete : async (req) => {
@@ -55,7 +53,7 @@ module.exports = {
                     resolve(res)
                 })
            })
-          .then(res=>console.log('Data :',res))
+          .then(res=>res.json({message: 'Data Successful Deleted '}))
           .catch(err=>console.log('error',err))
           .then(del=>Project.findByIdAndDelete(id,()=>{
               return del;

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 var path=require('path');
 const router = new express.Router;
+//const seneca = require('seneca')()
 const Organization = require('./controller/organization');
 const Project = require('./controller/project');
 const Invitation = require('./controller/invitation');

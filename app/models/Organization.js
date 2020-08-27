@@ -4,27 +4,15 @@ const OrganizationSchema = new mongoose.Schema({
         type:String,
         
     },
-    user: {
-        type:String,
-        enum : ['Owner','Manager', 'Member'],
-        default: 'Member'
-    },
-
-   /* created: 
-    {   type: Date, default: Date.now
-    
-    },
-    updated: {
-        type: Date, default: Date.now
-    },*/       
-    /*project : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],*/ 
-    userId : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'User'}
-    ]
+    users :{
+        id:[
+            {type:mongoose.Schema.Types.ObjectId,ref:'User'}
+           ],
+           role:{type:String}},
+        
 },{
     timestamps: true
-})
+});
+
 
 module.exports = mongoose.model('Organization',OrganizationSchema); 
