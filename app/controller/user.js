@@ -4,22 +4,14 @@ const Organization  = require('../models/Organization');
 
 module.exports = {
     create : async (req,res) =>{
-        new Promise((resolve,reject)=>{
              const { name,username,email,password } = req.body;
-             User.create({ 
+             const user = await User.create({ 
                  name,
                  username,
                  email,
                  password
-             },(err,res)=>{
-                 if(err) reject(err)
-                 resolve(res)
-             });
-            })
-        .then((result)=>{
-            return res.json(result)
-        })
-        .catch(err=>console.log('Error !',err))
+             })
+            return res.json(user);
     },
     find : async (req, res) => {
         const { id }=req.params;
