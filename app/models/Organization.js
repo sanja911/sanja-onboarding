@@ -4,12 +4,10 @@ const OrganizationSchema = new mongoose.Schema({
         type:String,
         
     },
-    users :{
-        id:[
-            {type:mongoose.Schema.Types.ObjectId,ref:'User'}
-           ],
-           role:{type:String}},
-        
+    users :[{
+      userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+      role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
+      }]
 },{
     timestamps: true
 });

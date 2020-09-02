@@ -26,6 +26,7 @@ router.get('/invitation/',Invitation.find);
 //task routes 
 router.post('/task/',Task.create); 
 router.get('/task/:id',Task.find);
+router.get('/task/',Task.findAll);
 router.put('/task/:id',Task.update); 
 router.delete('/task/:id',Task.delete);
 //user routes

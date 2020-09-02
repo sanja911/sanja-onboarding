@@ -7,20 +7,19 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-    
-
-        const { userid,projName, description,role} = req.body;
+        const {projName, description} = req.body;
+        const users = {'role':req.body.role, 'userId':req.body.userId}
+        const userId = req.body.userId;
         const projects = await Project.create({
             projName,
-            role,
             description,
-            userid,
+            users
         });
        // await post.save();
-        const userByUser= await Users.findById(userid)
+        const userByUser= await Users.findById(userId)
         userByUser.project.push(projects);
         await userByUser.save();
-        return res.json(userByUser); 
+        return res.json(projects); 
     },
 
     find : async (req, res) => {
@@ -35,30 +34,31 @@ module.exports = {
     update : async (req,res, next)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
-        new Promise ((resolve)=>{
-            Project.findById(id).update({
+        const users = {'role':req.body.role, 'userId':req.body.userId}
+        await Project.findById(id).updateOne({
                 projName,
-                description
+                description,
+                users
             })
-            resolve(res)
-        })
-        .then(res=>res.json({message:'Data Successful Updated'}))
-        .catch(err=>console.log(err))
+        const viewById = await Project.findById(id)
+        return res.json(viewById);
     },
 
-    delete : async (req) => {
+    delete : async (req,res) => {
        const {id}=req.params;
        new Promise((resolve)=>{
            Users.find({project:id}).updateOne({$pull:{project:id}},(res)=>{
                     resolve(res)
                 })
            })
-          .then(res=>res.json({message: 'Data Successful Deleted '}))
+          .then((result)=>{
+              return res.json(result)
+          })
           .catch(err=>console.log('error',err))
           .then(del=>Project.findByIdAndDelete(id,()=>{
               return del;
           }))
-        }
+        } 
        }
             
      

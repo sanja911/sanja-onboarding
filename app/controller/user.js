@@ -1,62 +1,59 @@
 const User = require('../models/User');
 //const Project = require('../models/Project');
 const Organization  = require('../models/Organization');
-const bcrypt = require('bcryptjs');
-const jwt = require ('jsonwebtoken')
+
 module.exports = {
-    create : async (req) =>{
+    create : async (req,res) =>{
         new Promise((resolve,reject)=>{
-            bcrypt.hash(req.body.password,10, (err,hash)=>{ 
-             if(err) reject(err);
-             const { name,username,email } = req.body;
+             const { name,username,email,password } = req.body;
              User.create({ 
                  name,
                  username,
                  email,
-                 password:hash
+                 password
              },(err,res)=>{
                  if(err) reject(err)
                  resolve(res)
              });
             })
+        .then((result)=>{
+            return res.json(result)
         })
-        .then(res=>console.log('Data :',res))
         .catch(err=>console.log('Error !',err))
     },
     find : async (req, res) => {
         const { id }=req.params;
         const user = await User.findById(id)
-        return res.send(user)
+        return res.json(user)
         
     },
 
-    update : async (req,res,next)=>{
+    update : async (req,res)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        new Promise((resolve)=>{
-            User.findById(id).update({
+        await User.findById(id).updateOne({
                 name,
-                username,
+                username, 
                 email,
-                password 
-            })
-            resolve(res)
+                password
         })
-       .then(res=>res.json({message:'Data Successful Updated'}))
-       .catch(err=>console.log('Error ! :' ,err))
-   
+        const viewById = await User.findById(id)
+        return res.json(viewById)
     },
+
     delete : async (req) => {
-        const {id}=req.params;
+       const {id}=req.params;
        new Promise((resolve)=>{
             Organization.find({user_id:id}).deleteOne({
                 user_id:id},(res)=>{                   
                        resolve(res);
                 })
          })
-        .then(res=>console.log('Data: ', res))
+        .then((result)=>{
+            return res.json(result)
+        })
         .catch(err=>console.log('error :',err))
-        .then(del=>User.findByIdAndDelete(id,()=>{
+        .then(del=>User.findByIdAndDelete(id,()=>{ 
             return del;
         }))
 }

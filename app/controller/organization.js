@@ -4,17 +4,17 @@ const User = require('../models/User');
 module.exports = {
     create : async (req, res) =>{
         const {name} = req.body;
-        const users = {'role':req.body.role, 'id':req.body.id}; 
-        const id = req.body.id
+        const users = {'role':req.body.role, 'userId':req.body.userId}; 
+        const userId = req.body.userId
         const organization = await Organization.create({
             name,
             users
         }) 
-        const userById = await User.findById(id);
+        const userById = await User.findById(userId);
         userById.orgId.push(organization);
         //userById.role.push(organization);
         await userById.save();
-        return res.json(userById);
+        return res.json(organization);
     },
 
     find : async (req, res) => {
@@ -27,19 +27,17 @@ module.exports = {
         const finds = await Organization.find();
         return res.json(finds);
     },
-    update : async (req,res, next)=>{
+    update : async (req,res)=>{
         const { id } = req.params;
         const {name}=req.body;
-        const userId = {'role':req.body.role, 'id':req.body.id}; 
-        new Promise ((resolve)=>{
-           Organization.findById(id).updateOne({
+        const users = {'role':req.body.role, 'userId':req.body.userId}; 
+        await Organization.findById(id).updateOne({
                 name,
-                userId,
-            })
-            resolve(res)
-        })
-        .then(res=>res.json({message:'Data Successful Updated'}))
-        .catch(err=>console.log(err))
+                users
+        });
+        const viewById = await Organization.findById(id)
+        
+        return res.json(viewById);
     },
 
 
@@ -50,7 +48,9 @@ module.exports = {
          resolve(res)
     })
   })
-  .then(res=>res.json({message:'Data Successful Deleted'}))
+  .then((result)=>{
+      return res.json(result)
+  })
   .catch(err=>console.log('error :',err))
   .then(del=>Organization.findByIdAndDelete(id,() =>{
   return del;

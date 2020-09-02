@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const Organization = require('../models/Organization');
 
 module.exports = {
     create : async (req, res) => {
@@ -20,22 +21,21 @@ module.exports = {
         const userById = await Project.findById(projectId);
         userById.task.push(tasks);
         await userById.save();
-        return res.json(userById);
+        return res.json(tasks);
     },
     find : async (req, res) => {
         const { id } = req.params;
         const task = await Task.findById(id)
         return res.json(task)
     },
-    findAll: async(res) => {
+    findAll: async(req,res) => {
         const task = await Task.find()
         return res.json(task) 
     },
     update : async (req,res,next)=>{
         const { id } = req.params;
         const { summary, description, createdBy,dueDate,status,assignee}=req.body;
-       new Promise((resolve)=>{
-        Task.findById(id).update({
+        await Task.findById(id).updateOne({
             summary,
             description,
             createdBy,
@@ -43,20 +43,19 @@ module.exports = {
             status,
             assignee
        })
-       resolve(res)
-    })
-       .then(res=>res.json({message:'Data Successful Updated'}))
-       .catch(err=>console.log(err))
-    
+      const viewById = await Task.findById(id)
+      return res.json(viewById)
     },
-    delete : async (req)=>{
+    delete : async (req,res)=>{
         const{id}=req.params;
         new Promise((resolve)=>{
             Project.find({task:id}).updateOne({
                 $pull:{task:id}},(res)=>{
                     resolve(res);
         })
-       .then(res=>res.json({message:'Data Successful Deleted'}))
+       .then((result)=>{
+           return res.json(result)
+       })
        .catch(err=>console.log('error ',err))
        .then(del=>Task.findByIdAndDelete(id,()=>{
         return del;

@@ -3,20 +3,15 @@ const ProjSchema = new mongoose.Schema({
     projName:{
         type:String
     },
-    role:{
-        type:String,  enum : ['Owner','Manager', 'Member'],
-        default: 'Member'
-    },
     description :{
         type: String
     },
-    userid :[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    users :[{
+        userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+        role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
     }],
     task:[{
-        type:mongoose.Schema.Types.ObjectId
-        ,ref:'Task'
+        type:mongoose.Schema.Types.ObjectId,ref:'Task'
     }]
    
     /*Created:{
