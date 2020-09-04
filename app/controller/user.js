@@ -1,6 +1,7 @@
 const User = require('../models/User');
-//const Project = require('../models/Project');
+const Project = require('../models/Project');
 const Organization  = require('../models/Organization');
+const { NotExtended } = require('http-errors');
 
 module.exports = {
     create : async (req,res) =>{
@@ -13,40 +14,42 @@ module.exports = {
              })
             return res.json(user);
     },
+    
     find : async (req, res) => {
         const { id }=req.params;
         const user = await User.findById(id)
-        return res.json(user)
-        
+        return res.json(user)    
     },
 
     update : async (req,res)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        await User.findById(id).updateOne({
-                name,
-                username, 
-                email,
-                password
-        })
+        await User.findOneAndUpdate({_id:id},{$set:req.body})
         const viewById = await User.findById(id)
         return res.json(viewById)
     },
 
-    delete : async (req) => {
+    delete : async (req,res) => {
        const {id}=req.params;
-       new Promise((resolve)=>{
-            Organization.find({user_id:id}).deleteOne({
-                user_id:id},(res)=>{                   
-                       resolve(res);
-                })
+        
+         new Promise((resolve,reject)=>{
+             User.findByIdAndDelete(id,(err,res)=>{
+                 if(err) reject(err)
+                 resolve(res)
+             })
          })
-        .then((result)=>{
-            return res.json(result)
+         .then(org_del=>Organization.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
+             if(err) next(err)
+             return org_del
+         }))
+         .then(proj_del=>Project.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
+             if(err) next(err)
+             return proj_del
+         }))
+         .catch(err=>console.log('error :',err))
+         .then((result)=>{
+            res.json({message:"Data "+id+" Successful Deleted"})
         })
-        .catch(err=>console.log('error :',err))
-        .then(del=>User.findByIdAndDelete(id,()=>{ 
-            return del;
-        }))
+           
 }
 }
