@@ -37,7 +37,7 @@ module.exports = {
                  if(err) reject(err)
                  resolve(res)
              })
-         })
+       
          .then(org_del=>Organization.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
              if(err) next(err)
              return org_del
@@ -49,7 +49,8 @@ module.exports = {
          .catch(err=>console.log('error :',err))
          .then((result)=>{
             res.json({message:"Data "+id+" Successful Deleted"})
-        })
+        })  
+    })
            
 }
 }
