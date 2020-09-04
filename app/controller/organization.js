@@ -31,29 +31,22 @@ module.exports = {
         const { id } = req.params;
         const {name}=req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}; 
-        await Organization.findById(id).updateOne({
-                name,
-                users
-        });
+        await Organization.findOneAndUpdate({_id:id},{$set:req.body,users});
         const viewById = await Organization.findById(id)
-        
         return res.json(viewById);
     },
 
-
-  delete: async(req,res) => {
+  delete: async(req,res)=>{
     const {id}=req.params;
     new Promise((resolve)=>{
-        User.find({orgId:id}).updateOne({$pull:{orgId:id}},(res)=>{
-         resolve(res)
-    })
-  })
-  .then((result)=>{
-      return res.json(result)
-  })
-  .catch(err=>console.log('error :',err))
-  .then(del=>Organization.findByIdAndDelete(id,() =>{
-  return del;
-  })) 
-}
+        Organization.findOneAndDelete({_id:id},(res)=>{
+            resolve(res)
+        })
+        .then(User.find({orgId:id}).updateOne({$pull:{orgId:id}},(res)=>{
+        }))
+        .catch(err=>console.log('error',err))
+        .then((result)=>{
+            return res.json({message:"Data "+id+ " Successful Deleted"})
+        })
+    })}
 }
