@@ -1,5 +1,4 @@
 const User = require('../models/User');
-//const Project = require('../models/Project');
 const Organization  = require('../models/Organization');
 const Project = require('../models/Project');
 
