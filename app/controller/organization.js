@@ -3,9 +3,8 @@ const User = require('../models/User');
 
 module.exports = {
     create : async (req, res) =>{
-        const {name} = req.body;
+        const {name,userId} = req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}; 
-        const userId = req.body.userId
         const organization = await Organization.create({
             name,
             users
@@ -37,6 +36,7 @@ module.exports = {
 
   delete: async(req,res)=>{
     const {id}=req.params;
+
     new Promise((resolve,reject)=>{
         Organization.findOneAndDelete({_id:id},(err,res)=>{
             if(err) reject(err)
@@ -46,7 +46,7 @@ module.exports = {
             if(err) next(err)
             return del
         }))
-        .catch(err=>console.log('error',err))
+        
         .then((result)=>{
             return res.json({message:"Data "+id+ " Successful Deleted"})
         })
