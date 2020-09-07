@@ -7,6 +7,7 @@ const ProjSchema = new mongoose.Schema({
         type: String
     },
     users :[{
+        _id:false,
         userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
         role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
     }],
