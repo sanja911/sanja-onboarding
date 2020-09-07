@@ -24,15 +24,11 @@ module.exports = {
     update : async (req,res)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        await User.findById(id).updateOne({
-                name,
-                username, 
-                email,
-                password
-        })
+        await User.findOneAndUpdate({_id:id},{$set:req.body})
         const viewById = await User.findById(id)
         return res.json(viewById)
     },
+
 
     delete : async (req,res) => {
         const {id}=req.params;
