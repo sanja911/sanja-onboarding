@@ -7,15 +7,13 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-        const {projName, description} = req.body;
+        const {projName, description,userId} = req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}
-        const userId = req.body.userId;
         const projects = await Project.create({
             projName,
             description,
             users
         });
-       // await post.save();
         const userByUser= await Users.findById(userId)
         userByUser.project.push(projects);
         await userByUser.save();
@@ -31,35 +29,31 @@ module.exports = {
         const finds = await Project.find();
         return res.json(finds);
     },
-    update : async (req,res, next)=>{
+    update : async (req,res)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}
-        await Project.findById(id).updateOne({
-                projName,
-                description,
-                users
-            })
+        await Project.findOneAndUpdate({_id:id},{$set:req.body,users})
         const viewById = await Project.findById(id)
         return res.json(viewById);
     },
 
     delete : async (req,res) => {
-       const {id}=req.params;
-       new Promise((resolve)=>{
-           Users.find({project:id}).updateOne({$pull:{project:id}},(res)=>{
+            const {id}=req.params;
+            new Promise((resolve,reject)=>{
+                Project.findOneAndDelete({_id:id},(err,res)=>{
+                    if(err) reject(err)
                     resolve(res)
                 })
-           })
-          .then((result)=>{
-              return res.json(result)
-          })
-          .catch(err=>console.log('error',err))
-          .then(del=>Project.findByIdAndDelete(id,()=>{
-              return del;
-          }))
-        } 
-       }
-            
-     
-    
+               .then(del=>Users.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
+                   if(err) next(err)
+                   return del
+               }))
+               .catch(err=>console.log('error',err))
+               .then((result)=>{
+                   return res.json({message:"Data "+id+ " Successful Deleted"})
+               })
+            })
+        }
+
+}

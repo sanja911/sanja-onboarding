@@ -1,13 +1,10 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
-const Organization = require('../models/Organization');
 
 module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-       // project = req.params;
-       // id = project.id;
         const { projectId,summary, description, createdBy,dueDate,status,assignee} = req.body;
         const tasks = await Task.create({
             projectId,
@@ -35,31 +32,25 @@ module.exports = {
     update : async (req,res,next)=>{
         const { id } = req.params;
         const { summary, description, createdBy,dueDate,status,assignee}=req.body;
-        await Task.findById(id).updateOne({
-            summary,
-            description,
-            createdBy,
-            dueDate,
-            status,
-            assignee
-       })
-      const viewById = await Task.findById(id)
-      return res.json(viewById)
+        await Task.findOneAndUpdate({_id:id},{$set:req.body})
+        const viewById = await Task.findById(id)
+        return res.json(viewById)
     },
     delete : async (req,res)=>{
         const{id}=req.params;
-        new Promise((resolve)=>{
-            Project.find({task:id}).updateOne({
-                $pull:{task:id}},(res)=>{
-                    resolve(res);
-        })
-       .then((result)=>{
-           return res.json(result)
-       })
-       .catch(err=>console.log('error ',err))
-       .then(del=>Task.findByIdAndDelete(id,()=>{
-        return del;
+        new Promise((resolve,reject)=>{
+            Task.findByIdAndDelete(id,(err,res)=>{
+                if(err) reject(err)
+                resolve(res)
+            })
+       .then(del_proj=>Project.find({task:id}).updateOne({$pull:{task:id}},(err,next)=>{
+           if(err) next(err)
+           return del_proj
        }))
+       .catch(err=>console.log('error ',err))
+       .then((result)=>{
+        return res.json({message:"Data "+id+" Successful Deleted"})
+        })
         })
     }
 }
