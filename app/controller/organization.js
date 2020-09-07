@@ -12,7 +12,6 @@ module.exports = {
         }) 
         const userById = await User.findById(userId);
         userById.orgId.push(organization);
-        //userById.role.push(organization);
         await userById.save();
         return res.json(organization);
     },
@@ -31,29 +30,25 @@ module.exports = {
         const { id } = req.params;
         const {name}=req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}; 
-        await Organization.findById(id).updateOne({
-                name,
-                users
-        });
+        await Organization.findOneAndUpdate({_id:id},{$set:req.body,users});
         const viewById = await Organization.findById(id)
-        
         return res.json(viewById);
     },
 
-
-  delete: async(req,res) => {
+  delete: async(req,res)=>{
     const {id}=req.params;
-    new Promise((resolve)=>{
-        User.find({orgId:id}).updateOne({$pull:{orgId:id}},(res)=>{
-         resolve(res)
-    })
-  })
-  .then((result)=>{
-      return res.json(result)
-  })
-  .catch(err=>console.log('error :',err))
-  .then(del=>Organization.findByIdAndDelete(id,() =>{
-  return del;
-  })) 
-}
+    new Promise((resolve,reject)=>{
+        Organization.findOneAndDelete({_id:id},(err,res)=>{
+            if(err) reject(err)
+            resolve(res)
+        })
+        .then(del=>User.find({orgId:id}).updateOne({$pull:{orgId:id}},(err,next)=>{
+            if(err) next(err)
+            return del
+        }))
+        .catch(err=>console.log('error',err))
+        .then((result)=>{
+            return res.json({message:"Data "+id+ " Successful Deleted"})
+        })
+    })}
 }
