@@ -1,6 +1,7 @@
 const User = require('../models/User');
 //const Project = require('../models/Project');
 const Organization  = require('../models/Organization');
+const Project = require('../models/Project');
 
 module.exports = {
     create : async (req,res) =>{
@@ -33,20 +34,28 @@ module.exports = {
         return res.json(viewById)
     },
 
-    delete : async (req) => {
-       const {id}=req.params;
-       new Promise((resolve)=>{
-            Organization.find({user_id:id}).deleteOne({
-                user_id:id},(res)=>{                   
-                       resolve(res);
-                })
+    delete : async (req,res) => {
+        const {id}=req.params;
+         
+          new Promise((resolve,reject)=>{
+              User.findByIdAndDelete(id,(err,res)=>{
+                  if(err) reject(err)
+                  resolve(res)
+              })
+        
+          .then(org_del=>Organization.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
+              if(err) next(err)
+              return org_del
+          }))
+          .then(proj_del=>Project.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
+            if(err) next(err)
+            return proj_del
+          }))
+          .catch(err=>console.log('error :',err))
+          .then((result)=>{
+             res.json({message:"Data "+id+" Successful Deleted"})
          })
-        .then((result)=>{
-            return res.json(result)
-        })
-        .catch(err=>console.log('error :',err))
-        .then(del=>User.findByIdAndDelete(id,()=>{ 
-            return del;
-        }))
-}
-}
+         })          
+ }
+ }
+ 
