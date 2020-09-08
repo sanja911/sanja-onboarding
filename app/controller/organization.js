@@ -1,6 +1,6 @@
 const Organization = require('../models/Organization');
 const User = require('../models/User');
-
+const Project = require('../models/Project');
 module.exports = {
     create : async (req, res) =>{
         const {name,userId} = req.body;
@@ -46,7 +46,10 @@ module.exports = {
             if(err) next(err)
             return del
         }))
-        
+        .then(del_proj=>Project.find({organizationId:id}).deleteMany({organizationId:id},(err,next)=>{
+            if(err) next(err)
+            return del_proj
+        }))
         .then((result)=>{
             return res.json({message:"Data "+id+ " Successful Deleted"})
         })

@@ -1,5 +1,6 @@
 const Project = require('../models/Project');
 const Users = require('../models/User');
+const Organization = require('../models/Organization');
 const { NotExtended } = require('http-errors');
 
 //const post=new Post()
@@ -7,16 +8,20 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-        const {projName, description,userId} = req.body;
+        const {projName, description,userId,organizationId} = req.body;
         const users = {'role':req.body.role, 'userId':req.body.userId}
         const projects = await Project.create({
             projName,
             description,
-            users
+            users,
+            organizationId
         });
-        const userByUser= await Users.findById(userId)
-        userByUser.project.push(projects);
-        await userByUser.save();
+        const orgById= await Organization.findById(organizationId)
+        const userById= await Users.findById(userId)
+        orgById.project.push(projects);
+        userById.project.push(projects);
+        await userById.save()
+        await orgById.save();
         return res.json(projects); 
     },
 
@@ -45,10 +50,15 @@ module.exports = {
                     if(err) reject(err)
                     resolve(res)
                 })
+                .then(del_proj=>Organization.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
+                    if(err) next(err)
+                    return del_proj
+                    }))
                .then(del=>Users.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
                    if(err) next(err)
                    return del
                }))
+               
                .catch(err=>console.log('error',err))
                .then((result)=>{
                    return res.json({message:"Data "+id+ " Successful Deleted"})
