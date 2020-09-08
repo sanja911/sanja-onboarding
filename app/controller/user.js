@@ -1,7 +1,6 @@
 const User = require('../models/User');
-const Organization  = require('../models/Organization');
 const Project = require('../models/Project');
-
+const Organization = require('../models/Organization');
 module.exports = {
     create : async (req,res) =>{
              const { name,username,email,password } = req.body;
@@ -30,26 +29,30 @@ module.exports = {
 
 
     delete : async (req,res) => {
-        const {id}=req.params;
-         
-          new Promise((resolve,reject)=>{
-              User.findByIdAndDelete(id,(err,res)=>{
-                  if(err) reject(err)
-                  resolve(res)
-              })
-        
-          .then(org_del=>Organization.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
-              if(err) next(err)
-              return org_del
-          }))
-          .then(proj_del=>Project.find({users:{userId:id}}).deleteMany({users:{userId:id}},(err,next)=>{
-            if(err) next(err)
-            return proj_del
-          }))
-          .catch(err=>console.log('error :',err))
-          .then((result)=>{
-             res.json({message:"Data "+id+" Successful Deleted"})
-         })
-         })          
+    const {id}=req.params;
+     // const org=await Organization.findOne({"users.userId" :id})
+
+        new Promise((resolve,reject)=>{
+            User.findByIdAndDelete(id,(err,res)=>{
+                if(err) reject(err)
+                resolve(res)
+            })
+      
+       
+        .then(proj_del=>Project.find({users:{userId:id}}).updateOne({$pull:{users:{userId:id}}},(err,next)=>{
+          if(err) next(err)
+          return proj_del
+        }))
+        .then(org_del=>Organization.find({"users.userId":id}).updateOne({$pull:{users:{userId:id}}},(err,next)=>{
+          if(err) next(err)
+          return org_del
+      }))
+        .catch(err=>console.log('error :',err))
+        .then((result)=>{
+
+        res.json({message:"Data "+id+" Successful Deleted"})
+       })
+       //return res.json(org)
+       })          
  }
  }
