@@ -39,11 +39,11 @@ module.exports = {
             })
       
        
-        .then(proj_del=>Project.find({users:{userId:id}}).updateOne({$pull:{users:{userId:id}}},(err,next)=>{
+        .then(proj_del=>Project.find({users:{userId:id}}).update({$pull:{users:{userId:id}}},(err,next)=>{
           if(err) next(err)
           return proj_del
         }))
-        .then(org_del=>Organization.find({"users.userId":id}).updateOne({$pull:{users:{userId:id}}},(err,next)=>{
+        .then(org_del=>Organization.find({"users.userId":id}).update({$pull:{users:{userId:id}}},(err,next)=>{
           if(err) next(err)
           return org_del
       }))
