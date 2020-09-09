@@ -1,56 +1,57 @@
 const Organization = require('../models/Organization');
 const User = require('../models/User');
-
+const Project = require('../models/Project');
 module.exports = {
     create : async (req, res) =>{
-        const { userId,name, user } = req.body;
-      
+        const {name,userId} = req.body;
+        const users = {'role':req.body.role, 'userId':req.body.userId}; 
         const organization = await Organization.create({
-            userId,
             name,
-            user
-        })
-  
+            users
+        }) 
         const userById = await User.findById(userId);
         userById.orgId.push(organization);
         await userById.save();
-        return res.send(userById);
+        return res.json(organization);
     },
 
     find : async (req, res) => {
         const { id } = req.params;
         const user = await Organization.findById(id)
-        return res.send(user)
+        return res.json(user)
     },
     
-    findAll : async(res)=>{
+    findAll : async(req,res)=>{
         const finds = await Organization.find();
-        console.log('Data :', res)
+        return res.json(finds);
     },
-    update : async (req,res,next)=>{
+    update : async (req,res)=>{
         const { id } = req.params;
-        const { name, user }=req.body;
-        Organization.findById(id).update({
-            name,
-            user,
-        },function(err){
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
-        });
-   
+        const {name}=req.body;
+        const users = {'role':req.body.role, 'userId':req.body.userId}; 
+        await Organization.findOneAndUpdate({_id:id},{$set:req.body,users});
+        const viewById = await Organization.findById(id)
+        return res.json(viewById);
     },
 
-  delete: async(req) => {
+  delete: async(req,res)=>{
     const {id}=req.params;
-    new Promise((resolve)=>{
-        User.find({orgId:id}).updateOne({$pull:{orgId:id}},(res)=>{
-         resolve(res)
-    })
-  })
-  .then(res=>console.log('Data :',res ,'Successful Delete'))
-  .catch(err=>console.log('error :',err))
-  .then(del=>Organization.findByIdAndDelete(id,() =>{
-  return del;
-  }))
-}
+
+    new Promise((resolve,reject)=>{
+        Organization.findOneAndDelete({_id:id},(err,res)=>{
+            if(err) reject(err)
+            resolve(res)
+        })
+        .then(del=>User.find({orgId:id}).updateOne({$pull:{orgId:id}},(err,next)=>{
+            if(err) next(err)
+            return del
+        }))
+        .then(del_proj=>Project.find({organizationId:id}).deleteMany({organizationId:id},(err,next)=>{
+            if(err) next(err)
+            return del_proj
+        }))
+        .then((result)=>{
+            return res.json({message:"Data "+id+ " Successful Deleted"})
+        })
+    })}
 }

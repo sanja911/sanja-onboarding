@@ -1,28 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose  = require('mongoose');
 const OrganizationSchema = new mongoose.Schema({
     name :{
         type:String,
         
     },
-    user: {
-        type:String,
-        enum : ['Owner','Manager', 'Member'],
-        default: 'Member'
-    },
-
-   /* created: 
-    {   type: Date, default: Date.now
-    
-    },
-    updated: {
-        type: Date, default: Date.now
-    },*/       
-    /*project : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'Project'}
-    ],*/ 
-    userId : [
-        {type: mongoose.Schema.Types.ObjectId,ref:'User'}
-    ]
+    users :[{
+        _id:false,
+        userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+        role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
+    }],
+    project :[{
+        type:mongoose.Schema.Types.ObjectId,ref:'Project'
+    }]
 },{
     timestamps: true
 })

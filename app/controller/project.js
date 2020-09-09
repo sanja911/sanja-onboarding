@@ -1,5 +1,6 @@
 const Project = require('../models/Project');
 const Users = require('../models/User');
+const Organization = require('../models/Organization');
 const { NotExtended } = require('http-errors');
 
 //const post=new Post()
@@ -7,61 +8,62 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-    
-
-        const { id,projName, description} = req.body;
+        const {projName, description,userId,organizationId} = req.body;
+        const users = {'role':req.body.role, 'userId':req.body.userId}
         const projects = await Project.create({
             projName,
             description,
-            id,
+            users,
+            organizationId
         });
-       // await post.save();
-        const userByUser= await Users.findById(id)
-        userByUser.project.push(projects);
-        await userByUser.save();
-        return res.send(userByUser); 
+        const orgById= await Organization.findById(organizationId)
+        const userById= await Users.findById(userId)
+        orgById.project.push(projects);
+        userById.project.push(projects);
+        await userById.save()
+        await orgById.save();
+        return res.json(projects); 
     },
 
     find : async (req, res) => {
         const {id}=req.params;
         const user = await Project.findById(id);
-        return res.send(user)
+        return res.json(user)
     },
-    findAll: async()=>{
-        new Promise((resolve,reject)=>{
-            Project.find(function(err,res){
-                if(err) reject(err)
-                resolve(res);
-            })
-        })
+    findAll : async(req,res)=>{
+        const finds = await Project.find();
+        return res.json(finds);
     },
-    update : async (req,res, next)=>{
+    update : async (req,res)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
-        Project.findById(id).update({
-            projName,
-            description,
-            user:id,
-        },(err)=>{
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
-        })
+        const users = {'role':req.body.role, 'userId':req.body.userId}
+        await Project.findOneAndUpdate({_id:id},{$set:req.body,users})
+        const viewById = await Project.findById(id)
+        return res.json(viewById);
     },
 
-    delete : async (req) => {
-       const {id}=req.params;
-       new Promise((resolve)=>{
-           Users.find({project:id}).updateOne({$pull:{project:id}},(res)=>{
+    delete : async (req,res) => {
+            const {id}=req.params;
+            new Promise((resolve,reject)=>{
+                Project.findOneAndDelete({_id:id},(err,res)=>{
+                    if(err) reject(err)
                     resolve(res)
                 })
-           })
-          .then(res=>console.log('Data :',res))
-          .catch(err=>console.log('error',err))
-          .then(del=>Project.findByIdAndDelete(id,()=>{
-              return del;
-          }))
+                .then(del_proj=>Organization.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
+                    if(err) next(err)
+                    return del_proj
+                    }))
+               .then(del=>Users.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
+                   if(err) next(err)
+                   return del
+               }))
+               
+               .catch(err=>console.log('error',err))
+               .then((result)=>{
+                   return res.json({message:"Data "+id+ " Successful Deleted"})
+               })
+            })
         }
-       }
-            
-     
-    
+
+}

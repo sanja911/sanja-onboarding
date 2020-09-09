@@ -5,11 +5,9 @@ module.exports = {
     create : async (req, res) => {
 
         console.log(req.params);
-       // project = req.params;
-       // id = project.id;
-        const { id,summary, description, createdBy,dueDate,status,assignee} = req.body;
+        const { projectId,summary, description, createdBy,dueDate,status,assignee} = req.body;
         const tasks = await Task.create({
-            id,
+            projectId,
             summary,
             description,
             createdBy,
@@ -17,48 +15,42 @@ module.exports = {
             status,
             assignee
         });
-        const userById = await Project.findById(id);
+        const userById = await Project.findById(projectId);
         userById.task.push(tasks);
         await userById.save();
-        return res.send(userById);
+        return res.json(tasks);
     },
     find : async (req, res) => {
         const { id } = req.params;
         const task = await Task.findById(id)
-        return res.send(task)
+        return res.json(task)
     },
-    findAll: async(res) => {
+    findAll: async(req,res) => {
         const task = await Task.find()
-        return res.send(task) 
+        return res.json(task) 
     },
     update : async (req,res,next)=>{
         const { id } = req.params;
         const { summary, description, createdBy,dueDate,status,assignee}=req.body;
-       Task.findById(id).update({
-            project:id,
-            summary,
-            description,
-            createdBy,
-            dueDate,
-            status,
-            assignee
-        },(err)=>{
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
-        })
+        await Task.findOneAndUpdate({_id:id},{$set:req.body})
+        const viewById = await Task.findById(id)
+        return res.json(viewById)
     },
-    delete : async (req)=>{
+    delete : async (req,res)=>{
         const{id}=req.params;
-        new Promise((resolve)=>{
-            Project.find({task:id}).updateOne({
-                $pull:{task:id}},(res)=>{
-                    resolve(res);
-        })
-       .then(res=>console.log('Data :', res))
-       .catch(err=>console.log('error ',err))
-       .then(del=>Task.findByIdAndDelete(id,()=>{
-        return del;
+        new Promise((resolve,reject)=>{
+            Task.findByIdAndDelete(id,(err,res)=>{
+                if(err) reject(err)
+                resolve(res)
+            })
+       .then(del_proj=>Project.find({task:id}).updateOne({$pull:{task:id}},(err,next)=>{
+           if(err) next(err)
+           return del_proj
        }))
+       .catch(err=>console.log('error ',err))
+       .then((result)=>{
+        return res.json({message:"Data "+id+" Successful Deleted"})
+        })
         })
     }
 }

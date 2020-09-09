@@ -6,21 +6,19 @@ const ProjSchema = new mongoose.Schema({
     description :{
         type: String
     },
-    user :[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    users :[{
+        _id:false,
+        userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+        role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
+    }],
+    organizationId :[{
+        type:mongoose.Schema.Types.ObjectId,ref:'Organization'
     }],
     task:[{
-        type:mongoose.Schema.Types.ObjectId
-        ,ref:'Task'
+        type:mongoose.Schema.Types.ObjectId,ref:'Task'
     }]
    
-    /*Created:{
-        type:Date, default:Date.now
-    },
-    Updated:{
-        type:Date, default:Date.now
-    }*/
+   
 },{
     timestamps:true
 })

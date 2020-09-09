@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 var path=require('path');
 const router = new express.Router;
+//const seneca = require('seneca')()
 const Organization = require('./controller/organization');
 const Project = require('./controller/project');
 const Invitation = require('./controller/invitation');
@@ -25,6 +26,7 @@ router.get('/invitation/',Invitation.find);
 //task routes 
 router.post('/task/',Task.create); 
 router.get('/task/:id',Task.find);
+router.get('/task/',Task.findAll);
 router.put('/task/:id',Task.update); 
 router.delete('/task/:id',Task.delete);
 //user routes

@@ -1,66 +1,58 @@
 const User = require('../models/User');
-//const Project = require('../models/Project');
-const Organization  = require('../models/Organization');
-const bcrypt = require('bcryptjs');
-const jwt = require ('jsonwebtoken')
+const Project = require('../models/Project');
+const Organization = require('../models/Organization');
 module.exports = {
-    create : async (req) =>{
-        new Promise((resolve,reject)=>{
-            bcrypt.hash(req.body.password,10, (err,hash)=>{ 
-             if(err) reject(err);
-             const { name,username,email } = req.body;
-             User.create({ 
+    create : async (req,res) =>{
+             const { name,username,email,password } = req.body;
+             const user = await User.create({ 
                  name,
                  username,
                  email,
-                 password:hash
-             },(err,res)=>{
-                 if(err) reject(err)
-                 resolve(res)
-             });
-            })
-        })
-        .then(res=>console.log('Data :',res))
-        .catch(err=>console.log('Error !',err))
+                 password
+             })
+            return res.json(user);
     },
     find : async (req, res) => {
         const { id }=req.params;
         const user = await User.findById(id)
-        return res.send(user)
+        return res.json(user)
         
     },
-    
-    view : async (res,req) => {
-        const {id}=req.params;
-        const user = await User.findById(id) 
-        return res.send(user)
-    },
-    update : async (req,res,next)=>{
+
+    update : async (req,res)=>{
         const { id } = req.params;
         const { name,username,email,password }=req.body;
-        User.findById(id).update({
-            name,
-            username,
-            email,
-            password 
-        },(err)=>{
-            if(err) return next(err);
-            res.json({message:'Data Successful Updated'})
-        });
-   
+        await User.findOneAndUpdate({_id:id},{$set:req.body})
+        const viewById = await User.findById(id)
+        return res.json(viewById)
     },
-    delete : async (req) => {
-        const {id}=req.params;
-       new Promise((resolve)=>{
-            Organization.find({user_id:id}).deleteOne({
-                user_id:id},(res)=>{                   
-                       resolve(res);
-                })
-         })
-        .then(res=>console.log('Data: ', res))
-        .catch(err=>console.log('error :',err))
-        .then(del=>User.findByIdAndDelete(id,()=>{
-            return del;
+
+
+    delete : async (req,res) => {
+    const {id}=req.params;
+     // const org=await Organization.findOne({"users.userId" :id})
+
+        new Promise((resolve,reject)=>{
+            User.findByIdAndDelete(id,(err,res)=>{
+                if(err) reject(err)
+                resolve(res)
+            })
+      
+       
+        .then(proj_del=>Project.find({users:{userId:id}}).update({$pull:{users:{userId:id}}},(err,next)=>{
+          if(err) next(err)
+          return proj_del
         }))
-}
-}
+        .then(org_del=>Organization.find({"users.userId":id}).update({$pull:{users:{userId:id}}},(err,next)=>{
+          if(err) next(err)
+          return org_del
+      }))
+        .catch(err=>console.log('error :',err))
+        .then((result)=>{
+
+        res.json({message:"Data "+id+" Successful Deleted"})
+       })
+       //return res.json(org)
+       })          
+ }
+ }

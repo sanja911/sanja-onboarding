@@ -1,20 +1,17 @@
 const Invitation = require('../models/Invitation');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
+
 module.exports = {
     create : async (req, res, err) => {
-
-        console.log(req.params);
-     
-        const { userId,name,user} = req.body;
+        const { userId,name} = req.body;
+        const users = {'role':req.body.role, 'userId':req.body.userId}; 
         const invitation = await Invitation.create({
             userId,
-
         });
         const organization= await Organization.create({
             name,
-            user,
-            userId
+            users,
         })
      
         const userById = await User.findById(userId);
@@ -22,16 +19,11 @@ module.exports = {
         userById.orgId.push(organization);       
         await userById.save();
         if(err) console.log('Error Detected!', err);
-        return res.send(userById);
+        return res.json(invitation);
         
     },
-    find : async(res)=>{
-    new Promise((resolve)=>{
-        Invitation.find(function(res){
-            resolve(res);
-        })
-    })
-    .then(res=>console.log('Data :',res))
-    .catch(err=>console.log('error',err))
-    }
+    find : async(req,res)=>{
+    const invitation= await Invitation.find();
+    return res.json(invitation)
+}
 }
