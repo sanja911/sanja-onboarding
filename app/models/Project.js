@@ -11,9 +11,9 @@ const ProjSchema = new mongoose.Schema({
         userId:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
         role:{type:String,enum:['Owner','Manager','Member'], default:'Member'}
     }],
-    organizationId :[{
+    organizationId :{
         type:mongoose.Schema.Types.ObjectId,ref:'Organization'
-    }],
+    },
     task:[{
         type:mongoose.Schema.Types.ObjectId,ref:'Task'
     }]

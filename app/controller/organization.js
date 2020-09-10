@@ -28,8 +28,8 @@ module.exports = {
     update : async (req,res)=>{
         const { id } = req.params;
         const {name}=req.body;
-        const users = {'role':req.body.role, 'userId':req.body.userId}; 
-        await Organization.findOneAndUpdate({_id:id},{$set:req.body,users});
+        //const users = {'role':req.body.role, 'userId':req.body.userId}; 
+        await Organization.findOneAndUpdate({_id:id},{$set:req.body});
         const viewById = await Organization.findById(id)
         return res.json(viewById);
     },
