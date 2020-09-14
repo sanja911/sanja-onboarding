@@ -37,8 +37,8 @@ module.exports = {
     update : async (req,res)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
-        const users = {'role':req.body.role, 'userId':req.body.userId}
-        await Project.findOneAndUpdate({_id:id},{$set:req.body,users})
+        //const users = {'role':req.body.role, 'userId':req.body.userId}
+        await Project.findOneAndUpdate({_id:id},{$set:req.body})
         const viewById = await Project.findById(id)
         return res.json(viewById);
     },
