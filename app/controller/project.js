@@ -2,50 +2,95 @@ const Project = require('../models/Project');
 const Users = require('../models/User');
 const Organization = require('../models/Organization');
 const { NotExtended } = require('http-errors');
-
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
+const auth = require('../middleware/auth');
+const jwtdecode = require('jwt-decode');
 //const post=new Post()
 module.exports = {
     create : async (req, res) => {
 
-        console.log(req.params);
-        const {projName, description,userId,organizationId} = req.body;
-        const users = {'role':req.body.role, 'userId':req.body.userId}
-        const projects = await Project.create({
+       console.log(req.params);
+       const {projName, description,userId,organizationId} = req.body;
+       const currentUser = res.locals.user
+       const findRole =await Organization.findOne({_id:organizationId},{users:{$elemMatch:{userId:currentUser.id}}}).exec();
+       const role = findRole.get('users.role').toString()
+       const users = {'role':role, 'userId':currentUser.id}     
+       const projects = await Project.create({
             projName,
             description,
             users,
             organizationId
+
         });
-        const orgById= await Organization.findById(organizationId)
-        const userById= await Users.findById(userId)
-        orgById.project.push(projects);
-        userById.project.push(projects);
-        await userById.save()
-        await orgById.save();
-        return res.json(projects); 
+            const orgById= await Organization.findById(organizationId)
+            const userById= await Users.findById(currentUser.id)
+            //let data = jwtdecode(token)
+            if(role==="Manager"||role==="Owner"){
+                orgById.project.push(projects);
+                // projects.users.push({role:"Manager",userId:currentUser.id})
+                await userById.save()
+                await orgById.save();
+                res.status(200).json({
+                    success: true,
+                    message: "User found",
+                    result: projects 
+                });   
+           }else{
+                res.status(401).json({
+                success: false,
+                message: "you are not authorized for this action",
+                result: null
+               })
+        }
+      
     },
 
     find : async (req, res) => {
         const {id}=req.params;
-        const user = await Project.findById(id);
-        return res.json(user)
+        const project = await Project.findById(id);
+        res.status(200).json({
+            success: true,
+            message: "Project found",
+            result:  user
+        })
     },
     findAll : async(req,res)=>{
         const finds = await Project.find();
-        return res.json(finds);
+        res.status(200).json(finds);
     },
     update : async (req,res)=>{
         const { id } = req.params;
         const {projName,description}=req.body;
-        //const users = {'role':req.body.role, 'userId':req.body.userId}
-        await Project.findOneAndUpdate({_id:id},{$set:req.body})
-        const viewById = await Project.findById(id)
-        return res.json(viewById);
-    },
-
+        const data = res.locals.user;
+        const organization = await Project.findById(id)
+        // console.log(organization.organizationId)
+        const findRole =await Organization.findById(organization.organizationId,{users:{$elemMatch:{userId:data.id}}}).exec();
+        const role = findRole.get('users.role').toString()
+        if(role==="Manager"||role==="Owner"){
+             const updateProject = await Project.findOneAndUpdate({_id:id},{$set:req.body})
+             const viewById = await Project.findById(id)
+             res.status(200).json({
+                success: true,
+                message: "Project Updated",
+                result: viewById
+             })
+         }else{
+           res.status(401).json({
+                success: false,
+                message: "you are not authorized for this action",
+                result: null
+         })
+        }
+       },
     delete : async (req,res) => {
             const {id}=req.params;
-            new Promise((resolve,reject)=>{
+            const data = res.locals.user;
+            const findRole =await Organization.findOne({_id:organizationId},{users:{$elemMatch:{userId:currentUser.id}}}).exec();
+            const role = findRole.get('users.role').toString()
+            if(role==="Manager"||role==="Owner"){
+                new Promise((resolve,reject)=>{
                 Project.findOneAndDelete({_id:id},(err,res)=>{
                     if(err) reject(err)
                     resolve(res)
@@ -61,9 +106,17 @@ module.exports = {
                
                .catch(err=>console.log('error',err))
                .then((result)=>{
-                   return res.json({message:"Data "+id+ " Successful Deleted"})
+                  res.status(200).json({message:"Data "+id+ " Successful Deleted"})
                })
             })
-        }
+           }else{
+               res.status(401).json({
+                    success: false,
+                    message: "you are not authorized for this action",
+                    result: null
+         })
+         }
+
+}
 
 }
