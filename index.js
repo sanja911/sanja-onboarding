@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const app = express();
 const config = require('./config');
+const User = './models/User'
 // middlewares
 app.set('secretKey','nodeRestApi')
 app.use(cors());
@@ -15,16 +16,6 @@ mongoose.connect('mongodb://localhost/EO',
     useNewUrlParser: true,
     useUnifiedTopology: true 
 })
-function validateUser(req, res, next) {
-  jwt.verify(req.headers['x-access-token'], req.app.get('secretKey'), function(err, decoded) {
-    if (err) {
-      res.json({status:"error", message: err.message, data:null});
-    }else{
-      req.body.userId = decoded.id;
-      next();
-    }
-  });
-}
   
 // routes
 //app.use('/user',validateUser,users)
