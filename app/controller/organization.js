@@ -1,6 +1,11 @@
 const Organization = require('../models/Organization');
 const User = require('../models/User');
 const Project = require('../models/Project');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
+const auth = require('../middleware/auth');
+const jwtdecode = require('jwt-decode');
 module.exports = {
     create : async (req, res) =>{
         const {name,userId} = req.body;
@@ -12,32 +17,56 @@ module.exports = {
         const userById = await User.findById(userId);
         userById.orgId.push(organization);
         await userById.save();
-        return res.json(organization);
+        res.status(200).json({
+                success: true,
+                message: "Organization Created",
+                result: organization
+        });
     },
 
     find : async (req, res) => {
         const { id } = req.params;
         const user = await Organization.findById(id)
-        return res.json(user)
+        res.status(200).json({
+            success: true,
+            message: "Organization Find",
+            result: user
+        });
     },
     
     findAll : async(req,res)=>{
         const finds = await Organization.find();
-        return res.json(finds);
+        res.status(200).json(finds);
     },
     update : async (req,res)=>{
-        const { id } = req.params;
-        const {name}=req.body;
-        //const users = {'role':req.body.role, 'userId':req.body.userId}; 
-        await Organization.findOneAndUpdate({_id:id},{$set:req.body});
-        const viewById = await Organization.findById(id)
-        return res.json(viewById);
-    },
+        const {id} = req.params
+        const data = res.locals.user
+        const findRole =await Organization.findOne({_id:id},{users:{$elemMatch:{userId:data.id}}}).exec();
+        const role = findRole.get('users.role').toString()
+        if(role==="Manager"||role==="Owner"){
+            await Organization.findOneAndUpdate({_id:id},{$set:req.body});
+            const viewById = await Organization.findById(id)
+            res.status(200).json({
+                success: true,
+                message: "Organization Updated",
+                result: viewById
+            });
+        }else{
+            res.status(401).json({
+                success: false,
+                message: "you are not authorized for this action",
+                result: null
+               })
+            }    
+  },
 
   delete: async(req,res)=>{
     const {id}=req.params;
-
-    new Promise((resolve,reject)=>{
+    let data = res.locals.user
+    const findRole =await Organization.findOne({_id:id},{users:{$elemMatch:{userId:data.id}}}).exec();
+    const role = findRole.get('users.role').toString()
+    if(role==="Manager"||role==="Owner"){
+        new Promise((resolve,reject)=>{
         Organization.findOneAndDelete({_id:id},(err,res)=>{
             if(err) reject(err)
             resolve(res)
@@ -51,7 +80,14 @@ module.exports = {
             return del_proj
         }))
         .then((result)=>{
-            return res.json({message:"Data "+id+ " Successful Deleted"})
+            res.status(200).json({message:"Data "+id+ " Successful Deleted"})
         })
+    })
+    }else{
+         res.status(401).json({
+         success: false,
+         message: "You are not logged in",
+         result: null
     })}
+   }
 }

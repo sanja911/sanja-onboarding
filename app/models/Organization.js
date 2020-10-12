@@ -11,6 +11,9 @@ const OrganizationSchema = new mongoose.Schema({
     }],
     project :[{
         type:mongoose.Schema.Types.ObjectId,ref:'Project'
+    }],
+    invitationId :[{
+        type:mongoose.Schema.Types.ObjectId,ref:'Invitation'
     }]
 },{
     timestamps: true
