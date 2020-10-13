@@ -36,15 +36,6 @@ const UserSchema = new mongoose.Schema({
 },{
     timestamps:true
 })
-/*UserSchema.pre('create',function(next){
-    this.password = bcrypt.hashSync(this.password, saltRounds);
-    next()
-})*/
-UserSchema.methods.comparePassword = function (input, callback) {
-    bcrypt.compare(input, this.password, function (err, isMatch) {
-        if (err) return callback(err);
-        callback(null, isMatch);
-    });
-};
+
 
 module.exports = mongoose.model('User',UserSchema);

@@ -1,5 +1,5 @@
 let config = {
-    JWT_SECRET: "secretKey"
+	JWT_SECRET: "pkIDto20rbMXCtD"
 };
 
 module.exports = config;
