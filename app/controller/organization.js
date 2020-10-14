@@ -47,19 +47,19 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     const role = findRole.get("users.role").toString();
-    if (role === "Manager" || role === "Owner") {
+    if (!["Manager", "Owner"].includes(role)) {
+      res.status(401).json({
+        success: false,
+        message: "you are not authorized for this action",
+        result: null
+      });
+    } else {
       await Organization.findOneAndUpdate({ _id: id }, { $set: req.body });
       const viewById = await Organization.findById(id);
       res.status(200).json({
         success: true,
         message: "Organization Updated",
         result: viewById
-      });
-    } else {
-      res.status(401).json({
-        success: false,
-        message: "you are not authorized for this action",
-        result: null
       });
     }
   },

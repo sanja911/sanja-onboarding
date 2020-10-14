@@ -17,13 +17,21 @@ module.exports = {
       { _id: organizationId },
       { users: { $elemMatch: { userId: currentUser.id } } }
     ).exec();
+    console.log(findRole);
     if (!findRole)
       res.status(403).json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
-    const users = { role: role, userId: currentUser.id };
-    const orgById = await Organization.findById(organizationId);
-    const userById = await Users.findById(currentUser.id);
-    if (role === "Manager" || role === "Owner") {
+    console.log(role);
+    if (!["Manager", "Owner"].includes(role)) {
+      res.status(401).json({
+        success: false,
+        message: "you are not authorized for this action",
+        result: null
+      });
+    } else {
+      const orgById = await Organization.findById(organizationId);
+      const userById = await Users.findById(currentUser.id);
+      const users = { role: "Manager", userId: currentUser.id };
       const projects = await Project.create({
         projName,
         description,
@@ -32,21 +40,12 @@ module.exports = {
       });
       orgById.project.push(projects);
       userById.project.push(projects);
-      projects.users.push({ role: "Manager", userId: currentUser.id });
       await userById.save();
-      await projects.save();
-      await usersById.save();
       await orgById.save();
       res.status(200).json({
         success: true,
         message: "User found",
         result: projects
-      });
-    } else {
-      res.status(401).json({
-        success: false,
-        message: "you are not authorized for this action",
-        result: null
       });
     }
   },
@@ -62,10 +61,12 @@ module.exports = {
       result: project
     });
   },
+
   findAll: async (req, res) => {
     const finds = await Project.find();
     res.status(200).json(finds);
   },
+
   update: async (req, res) => {
     const { id } = req.params;
     const { projName, description } = req.body;
@@ -77,7 +78,13 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     const projectRole = findProjRole.get("users.role").toString();
-    if (projectRole === "Manager" || projectRole === "Owner") {
+    if (!["Manager", "Owner"].includes(projectRole)) {
+      res.status(401).json({
+        success: false,
+        message: "you are not authorized for this action",
+        result: null
+      });
+    } else {
       const updateProject = await Project.findOneAndUpdate(
         { _id: id },
         { $set: req.body }
@@ -88,14 +95,9 @@ module.exports = {
         message: "Project Updated",
         result: viewById
       });
-    } else {
-      res.status(401).json({
-        success: false,
-        message: "you are not authorized for this action",
-        result: null
-      });
     }
   },
+
   delete: async (req, res) => {
     const { id } = req.params;
     const data = res.locals.user;
