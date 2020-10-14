@@ -100,7 +100,7 @@ module.exports = {
             )
           )
           .then(del_uproj =>
-            User.find({ project: project._id }).updateOne(
+            User.find({ project: project._id }).update(
               { $pull: { project: project._id } },
               (err, next) => {
                 if (err) next(err);

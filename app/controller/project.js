@@ -20,10 +20,9 @@ module.exports = {
     if (!findRole)
       res.status(403).json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
-    const users = { role: req.body.role, userId: req.body.userId };
+    const users = { role: role, userId: currentUser.id };
     const orgById = await Organization.findById(organizationId);
     const userById = await Users.findById(currentUser.id);
-    const usersById = await Users.findById(users.userId);
     if (role === "Manager" || role === "Owner") {
       const projects = await Project.create({
         projName,
@@ -33,7 +32,6 @@ module.exports = {
       });
       orgById.project.push(projects);
       userById.project.push(projects);
-      usersById.project.push(projects);
       projects.users.push({ role: "Manager", userId: currentUser.id });
       await userById.save();
       await projects.save();
