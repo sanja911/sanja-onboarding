@@ -13,7 +13,7 @@ module.exports = {
     const users = { role: req.body.role, userId: data.id };
     const organization = await Organization.create({
       name,
-      users
+      users,
     });
     const userById = await User.findById(data.id);
     userById.orgId.push(organization);
@@ -21,7 +21,7 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "Organization Created",
-      result: organization
+      result: organization,
     });
   },
 
@@ -31,7 +31,7 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "Organization Find",
-      result: user
+      result: user,
     });
   },
 
@@ -46,12 +46,11 @@ module.exports = {
       { _id: id },
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
-    const role = findRole.get("users.role").toString();
-    if (!["Manager", "Owner"].includes(role)) {
+    if (!findRole) {
       res.status(401).json({
         success: false,
         message: "you are not authorized for this action",
-        result: null
+        result: null,
       });
     } else {
       await Organization.findOneAndUpdate({ _id: id }, { $set: req.body });
@@ -59,7 +58,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Organization Updated",
-        result: viewById
+        result: viewById,
       });
     }
   },
@@ -81,7 +80,7 @@ module.exports = {
           if (err) reject(err);
           resolve(res);
         })
-          .then(del =>
+          .then((del) =>
             User.find({ orgId: id }).updateOne(
               { $pull: { orgId: id } },
               (err, next) => {
@@ -90,7 +89,7 @@ module.exports = {
               }
             )
           )
-          .then(del_proj =>
+          .then((del_proj) =>
             Project.find({ organizationId: id }).deleteMany(
               { organizationId: id },
               (err, next) => {
@@ -99,7 +98,7 @@ module.exports = {
               }
             )
           )
-          .then(del_uproj =>
+          .then((del_uproj) =>
             User.find({ project: project._id }).update(
               { $pull: { project: project._id } },
               (err, next) => {
@@ -108,12 +107,12 @@ module.exports = {
               }
             )
           )
-          .then(result => {
+          .then((result) => {
             res
               .status(200)
               .json({ message: "Data " + id + " Successful Deleted" });
           });
       });
     }
-  }
+  },
 };

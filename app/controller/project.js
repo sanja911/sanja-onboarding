@@ -26,7 +26,7 @@ module.exports = {
       res.status(401).json({
         success: false,
         message: "you are not authorized for this action",
-        result: null
+        result: null,
       });
     } else {
       const orgById = await Organization.findById(organizationId);
@@ -36,7 +36,7 @@ module.exports = {
         projName,
         description,
         users,
-        organizationId
+        organizationId,
       });
       orgById.project.push(projects);
       userById.project.push(projects);
@@ -45,7 +45,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "User found",
-        result: projects
+        result: projects,
       });
     }
   },
@@ -58,7 +58,7 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "Project found",
-      result: project
+      result: project,
     });
   },
 
@@ -73,29 +73,16 @@ module.exports = {
     const data = res.locals.user;
     const organization = await Project.findById(id);
     // console.log(organization.organizationId)
-    const findProjRole = await Project.findOne(
+    const updateProject = await Project.findOneAndUpdate(
       { _id: id },
-      { users: { $elemMatch: { userId: data.id } } }
-    ).exec();
-    const projectRole = findProjRole.get("users.role").toString();
-    if (!["Manager", "Owner"].includes(projectRole)) {
-      res.status(401).json({
-        success: false,
-        message: "you are not authorized for this action",
-        result: null
-      });
-    } else {
-      const updateProject = await Project.findOneAndUpdate(
-        { _id: id },
-        { $set: req.body }
-      );
-      const viewById = await Project.findById(id);
-      res.status(200).json({
-        success: true,
-        message: "Project Updated",
-        result: viewById
-      });
-    }
+      { $set: req.body }
+    );
+    const viewById = await Project.findById(id);
+    res.status(200).json({
+      success: true,
+      message: "Project Updated",
+      result: viewById,
+    });
   },
 
   delete: async (req, res) => {
@@ -122,7 +109,7 @@ module.exports = {
           if (err) reject(err);
           resolve(res);
         })
-          .then(del_proj =>
+          .then((del_proj) =>
             Organization.find({ project: id }).updateOne(
               { $pull: { project: id } },
               (err, next) => {
@@ -131,7 +118,7 @@ module.exports = {
               }
             )
           )
-          .then(del =>
+          .then((del) =>
             Users.find({ project: id }).updateOne(
               { $pull: { project: id } },
               (err, next) => {
@@ -141,8 +128,8 @@ module.exports = {
             )
           )
 
-          .catch(err => console.log("error", err))
-          .then(result => {
+          .catch((err) => console.log("error", err))
+          .then((result) => {
             res
               .status(200)
               .json({ message: "Data " + id + " Successful Deleted" });
@@ -152,8 +139,8 @@ module.exports = {
       res.status(401).json({
         success: false,
         message: "you are not authorized for this action",
-        result: null
+        result: null,
       });
     }
-  }
+  },
 };
