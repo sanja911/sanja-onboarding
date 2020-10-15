@@ -1,69 +1,146 @@
-const Project = require('../models/Project');
-const Users = require('../models/User');
-const Organization = require('../models/Organization');
-const { NotExtended } = require('http-errors');
-
+const Project = require("../models/Project");
+const Users = require("../models/User");
+const Organization = require("../models/Organization");
+const { NotExtended } = require("http-errors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("../../config");
+const auth = require("../middleware/auth");
+const jwtdecode = require("jwt-decode");
 //const post=new Post()
 module.exports = {
-    create : async (req, res) => {
+  create: async (req, res) => {
+    console.log(req.params);
+    const { projName, description, userId, organizationId } = req.body;
+    const currentUser = res.locals.user;
+    const findRole = await Organization.findOne(
+      { _id: organizationId },
+      { users: { $elemMatch: { userId: currentUser.id } } }
+    ).exec();
+    console.log(findRole);
+    if (!findRole)
+      res.status(403).json({ success: false, message: "Data Not found" });
+    const role = findRole.get("users.role").toString();
+    console.log(role);
+    if (!["Manager", "Owner"].includes(role)) {
+      res.status(401).json({
+        success: false,
+        message: "you are not authorized for this action",
+        result: null,
+      });
+    } else {
+      const orgById = await Organization.findById(organizationId);
+      const userById = await Users.findById(currentUser.id);
+      const users = { role: "Manager", userId: currentUser.id };
+      const projects = await Project.create({
+        projName,
+        description,
+        users,
+        organizationId,
+      });
+      orgById.project.push(projects);
+      userById.project.push(projects);
+      await userById.save();
+      await orgById.save();
+      res.status(200).json({
+        success: true,
+        message: "User found",
+        result: projects,
+      });
+    }
+  },
 
-        console.log(req.params);
-        const {projName, description,userId,organizationId} = req.body;
-        const users = {'role':req.body.role, 'userId':req.body.userId}
-        const projects = await Project.create({
-            projName,
-            description,
-            users,
-            organizationId
-        });
-        const orgById= await Organization.findById(organizationId)
-        const userById= await Users.findById(userId)
-        orgById.project.push(projects);
-        userById.project.push(projects);
-        await userById.save()
-        await orgById.save();
-        return res.json(projects); 
-    },
+  find: async (req, res) => {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project)
+      res.status(403).json({ success: false, message: "Data Not found" });
+    res.status(200).json({
+      success: true,
+      message: "Project found",
+      result: project,
+    });
+  },
 
-    find : async (req, res) => {
-        const {id}=req.params;
-        const user = await Project.findById(id);
-        return res.json(user)
-    },
-    findAll : async(req,res)=>{
-        const finds = await Project.find();
-        return res.json(finds);
-    },
-    update : async (req,res)=>{
-        const { id } = req.params;
-        const {projName,description}=req.body;
-        //const users = {'role':req.body.role, 'userId':req.body.userId}
-        await Project.findOneAndUpdate({_id:id},{$set:req.body})
-        const viewById = await Project.findById(id)
-        return res.json(viewById);
-    },
+  findAll: async (req, res) => {
+    const finds = await Project.find();
+    res.status(200).json(finds);
+  },
 
-    delete : async (req,res) => {
-            const {id}=req.params;
-            new Promise((resolve,reject)=>{
-                Project.findOneAndDelete({_id:id},(err,res)=>{
-                    if(err) reject(err)
-                    resolve(res)
-                })
-                .then(del_proj=>Organization.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
-                    if(err) next(err)
-                    return del_proj
-                    }))
-               .then(del=>Users.find({project:id}).updateOne({$pull:{project:id}},(err,next)=>{
-                   if(err) next(err)
-                   return del
-               }))
-               
-               .catch(err=>console.log('error',err))
-               .then((result)=>{
-                   return res.json({message:"Data "+id+ " Successful Deleted"})
-               })
-            })
-        }
+  update: async (req, res) => {
+    const { id } = req.params;
+    const { projName, description } = req.body;
+    const data = res.locals.user;
+    const organization = await Project.findById(id);
+    // console.log(organization.organizationId)
+    const updateProject = await Project.findOneAndUpdate(
+      { _id: id },
+      { $set: req.body }
+    );
+    const viewById = await Project.findById(id);
+    res.status(200).json({
+      success: true,
+      message: "Project Updated",
+      result: viewById,
+    });
+  },
 
-}
+  delete: async (req, res) => {
+    const { id } = req.params;
+    const data = res.locals.user;
+    const organization = await Project.findById(id);
+    if (!organization)
+      res.status(403).json({ success: false, message: "Data Not Found" });
+    const findRole = await Organization.findOne(
+      { _id: organization.organizationId },
+      { users: { $elemMatch: { userId: data.id } } }
+    ).exec();
+    const findProjRole = await Project.findOne(
+      { _id: id },
+      { users: { $elemMatch: { userId: data.id } } }
+    ).exec();
+    if (!findRole && !findProjRole)
+      res.status(403).json({ success: false, message: "Data Not found" });
+    const role = findRole.get("users.role").toString();
+    const projectRole = findProjRole.get("users.role").toString();
+    if (projectRole === "Manager" || projectRole === "Owner") {
+      new Promise((resolve, reject) => {
+        Project.findOneAndDelete({ _id: id }, (err, res) => {
+          if (err) reject(err);
+          resolve(res);
+        })
+          .then((del_proj) =>
+            Organization.find({ project: id }).updateOne(
+              { $pull: { project: id } },
+              (err, next) => {
+                if (err) next(err);
+                return del_proj;
+              }
+            )
+          )
+          .then((del) =>
+            Users.find({ project: id }).updateOne(
+              { $pull: { project: id } },
+              (err, next) => {
+                if (err) next(err);
+                return del;
+              }
+            )
+          )
+
+          .catch((err) => console.log("error", err))
+          .then((result) => {
+            res
+              .status(200)
+              .json({ message: "Data " + id + " Successful Deleted" });
+          });
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: "you are not authorized for this action",
+        result: null,
+      });
+    }
+  },
+};

@@ -1,4 +1,8 @@
 const mongoose  = require('mongoose');
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
+const auth = require('../middleware/auth');
+const jwtdecode = require('jwt-decode');
 const ProjSchema = new mongoose.Schema({
     projName:{
         type:String
