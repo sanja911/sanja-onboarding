@@ -90,7 +90,7 @@ module.exports = {
     const data = res.locals.user;
     const organization = await Project.findById(id);
     if (!organization)
-      res.status(403).json({ success: false, message: "Data Not Found" });
+      res.status(404).json({ success: false, message: "Data Not Found" });
     const findRole = await Organization.findOne(
       { _id: organization.organizationId },
       { users: { $elemMatch: { userId: data.id } } }
