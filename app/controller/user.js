@@ -14,7 +14,7 @@ module.exports = {
       name,
       username,
       email,
-      password: hash
+      password: hash,
     });
     return res.status(200).json(user);
   },
@@ -30,11 +30,11 @@ module.exports = {
     if (!userInfo)
       res.status(403).json({ success: false, message: "User Not found" });
     const token = jwt.sign({ id: userInfo._id }, config.JWT_SECRET, {
-      expiresIn: "2h"
+      expiresIn: "2h",
     });
     return res.status(200).json({
       success: true,
-      data: { userInfo, token }
+      data: { userInfo, token },
     });
   },
   find: async (req, res, next) => {
@@ -45,7 +45,7 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "User found",
-      result: find
+      result: find,
     });
   },
   myProject: async (req, res) => {
@@ -53,12 +53,13 @@ module.exports = {
     const findProject = await User.findOne({ _id: data.id })
       .populate("project")
       .exec();
+
     if (!findProject)
       res.status(403).json({ success: false, message: "User Not Found" });
     res.status(200).json({
       success: true,
       message: "My Project List",
-      result: findProject
+      result: findProject,
     });
   },
   myOrganization: async (req, res) => {
@@ -71,14 +72,14 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "My Organization List",
-      result: findOrganization
+      result: findOrganization,
     });
   },
   update: async (req, res) => {
     const data = res.locals.user;
     const { name, username, email, password } = req.body;
     const update = await User.findById({ _id: data.id }).update({
-      $set: req.body
+      $set: req.body,
     });
     const viewById = await User.findById(data.id);
     if (!viewById)
@@ -86,7 +87,7 @@ module.exports = {
     res.status(200).json({
       success: true,
       message: "User Updated",
-      result: viewById
+      result: viewById,
     });
   },
   delete: async (req, res) => {
@@ -96,7 +97,7 @@ module.exports = {
         if (err) reject(err);
         resolve(res);
       })
-        .then(proj_del =>
+        .then((proj_del) =>
           Project.find({ users: { userId: data.id } }).update(
             { $pull: { users: { userId: data.id } } },
             (err, next) => {
@@ -105,7 +106,7 @@ module.exports = {
             }
           )
         )
-        .then(org_del =>
+        .then((org_del) =>
           Organization.find({ "users.userId": data.id }).update(
             { $pull: { users: { userId: data.id } } },
             (err, next) => {
@@ -114,11 +115,11 @@ module.exports = {
             }
           )
         )
-        .catch(err => console.log("error :", err))
-        .then(result => {
+        .catch((err) => console.log("error :", err))
+        .then((result) => {
           res.json({ message: "Data " + data.id + " Successful Deleted" });
         });
       //return res.json(org)
     });
-  }
+  },
 };
