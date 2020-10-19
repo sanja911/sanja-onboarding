@@ -31,23 +31,14 @@ module.exports = {
   find: async (req, res) => {
     const { id } = req.params;
     const task = await Task.findById(id);
-    if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
     return res.json(task);
   },
   findAll: async (req, res) => {
-    const data = res.locals.user;
-    const find = await Project.find({
-      users: { $elemMatch: { userId: data.id } },
-    });
     const task = await Task.find();
     return res.json(task);
   },
   update: async (req, res, next) => {
     const { id } = req.params;
-    const task = await Task.findById(id);
-    if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
     const {
       summary,
       description,
@@ -62,9 +53,6 @@ module.exports = {
   },
   delete: async (req, res) => {
     const { id } = req.params;
-    const task = await Task.findById(id);
-    if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
     new Promise((resolve, reject) => {
       Task.findByIdAndDelete(id, (err, res) => {
         if (err) reject(err);
@@ -81,9 +69,7 @@ module.exports = {
         )
         .catch((err) => console.log("error ", err))
         .then((result) => {
-          return res
-            .status(200)
-            .json({ message: "Data " + id + " Successful Deleted" });
+          return res.json({ message: "Data " + id + " Successful Deleted" });
         });
     });
   },
