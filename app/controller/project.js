@@ -1,12 +1,6 @@
 const Project = require("../models/Project");
 const Users = require("../models/User");
 const Organization = require("../models/Organization");
-const { NotExtended } = require("http-errors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
 //const post=new Post()
 module.exports = {
   create: async (req, res) => {
@@ -42,7 +36,7 @@ module.exports = {
       userById.project.push(projects);
       await userById.save();
       await orgById.save();
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "User found",
         result: projects,
@@ -55,7 +49,7 @@ module.exports = {
     const project = await Project.findById(id);
     if (!project)
       res.status(403).json({ success: false, message: "Data Not found" });
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Project found",
       result: project,
@@ -64,7 +58,11 @@ module.exports = {
 
   findAll: async (req, res) => {
     const finds = await Project.find();
-    res.status(200).json(finds);
+    if (!finds)
+      res.status(404).json({ success: false, message: "Data Not Found" });
+    return res
+      .status(200)
+      .json({ success: false, message: "Data Found", result: finds });
   },
 
   update: async (req, res) => {
@@ -72,13 +70,16 @@ module.exports = {
     const { projName, description } = req.body;
     const data = res.locals.user;
     const organization = await Project.findById(id);
+    if (!organization)
+      res.status(404).json({ success: false, message: "Data Not Found" });
     // console.log(organization.organizationId)
     const updateProject = await Project.findOneAndUpdate(
       { _id: id },
       { $set: req.body }
     );
+
     const viewById = await Project.findById(id);
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Project Updated",
       result: viewById,
@@ -101,7 +102,6 @@ module.exports = {
     ).exec();
     if (!findRole && !findProjRole)
       res.status(403).json({ success: false, message: "Data Not found" });
-    const role = findRole.get("users.role").toString();
     const projectRole = findProjRole.get("users.role").toString();
     if (projectRole === "Manager" || projectRole === "Owner") {
       new Promise((resolve, reject) => {

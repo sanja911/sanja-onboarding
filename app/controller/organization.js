@@ -18,7 +18,7 @@ module.exports = {
     const userById = await User.findById(data.id);
     userById.orgId.push(organization);
     await userById.save();
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Organization Created",
       result: organization,
@@ -28,7 +28,9 @@ module.exports = {
   find: async (req, res) => {
     const { id } = req.params;
     const user = await Organization.findById(id);
-    res.status(200).json({
+    if (!user)
+      res.status(404).json({ success: false, message: "Data Not Found" });
+    return res.status(200).json({
       success: true,
       message: "Organization Find",
       result: user,
@@ -37,7 +39,9 @@ module.exports = {
 
   findAll: async (req, res) => {
     const finds = await Organization.find();
-    res.status(200).json(finds);
+    if (!finds)
+      res.status(404).json({ success: false, message: "Data Not Found" });
+    return res.status(200).json(finds);
   },
   update: async (req, res) => {
     const { id } = req.params;
@@ -47,7 +51,7 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole) {
-      res.status(401).json({
+      res.status(403).json({
         success: false,
         message: "you are not authorized for this action",
         result: null,

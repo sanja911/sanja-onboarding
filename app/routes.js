@@ -36,8 +36,8 @@ router.delete("/task/:id", auth.isAuthenticated, Task.delete);
 //user routes
 router.post("/user/", Users.create);
 router.post("/user/signin", Users.signin);
-router.get("/user/project", auth.isAuthenticated, Users.myProject);
-router.get("/user/organization", auth.isAuthenticated, Users.myOrganization);
+router.get("/user/list", auth.isAuthenticated, Users.myList);
+router.get("/user/managed", auth.isAuthenticated, Users.myManaged);
 router.get("/user/:id", auth.isAuthenticated, Users.find);
 router.put("/user/", auth.isAuthenticated, Users.update);
 router.delete("/user/", auth.isAuthenticated, Users.delete);
