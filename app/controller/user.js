@@ -4,8 +4,6 @@ const Organization = require("../models/Organization");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
 module.exports = {
   create: async (req, res, next) => {
     const hash = bcrypt.hashSync(req.body.password, 10);
@@ -21,14 +19,14 @@ module.exports = {
   signin: async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     const pass = bcrypt.compareSync(req.body.password, user.password);
     const userInfo = await User.findOne(
       { email: req.body.email },
       { password: pass }
     );
     if (!userInfo)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     const token = jwt.sign({ id: userInfo._id }, config.JWT_SECRET, {
       expiresIn: "2h",
     });
@@ -41,7 +39,7 @@ module.exports = {
     const { id } = req.params;
     const find = await User.findById(id);
     if (!find)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     res.status(200).json({
       success: true,
       message: "User found",
@@ -54,7 +52,7 @@ module.exports = {
       .populate("project")
       .exec();
     if (!findProject)
-      res.status(403).json({ success: false, message: "User Not Found" });
+      res.status(404).json({ success: false, message: "User Not Found" });
     res.status(200).json({
       success: true,
       message: "My Project List",
@@ -67,8 +65,8 @@ module.exports = {
       users: { userId: data.id, role: "Manager" && "Owner" },
     }).populate("project");
     if (!findOrg)
-      res.status(403).json({ success: false, message: "User Not Found" });
-    res.status(200).json({
+      res.status(404).json({ success: false, message: "User Not Found" });
+    return res.status(200).json({
       success: true,
       message: "My Organization List",
       result: findOrg,
@@ -82,8 +80,8 @@ module.exports = {
     });
     const viewById = await User.findById(data.id);
     if (!viewById)
-      res.status(403).json({ success: false, message: "User Not found" });
-    res.status(200).json({
+      res.status(404).json({ success: false, message: "User Not found" });
+    return res.status(200).json({
       success: true,
       message: "User Updated",
       result: viewById,

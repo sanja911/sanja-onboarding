@@ -76,7 +76,7 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole)
-      res.status(403).json({ success: false, message: "Data Not found" });
+      res.status(404).json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
     if (role === "Manager" || role === "Owner") {
       new Promise((resolve, reject) => {

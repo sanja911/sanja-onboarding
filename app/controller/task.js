@@ -37,9 +37,7 @@ module.exports = {
   },
   findAll: async (req, res) => {
     const data = res.locals.user;
-    const find = await Project.find({
-      users: { $elemMatch: { userId: data.id } },
-    });
+    const find = await Task.find({}).populate("projectId");
     const task = await Task.find();
     return res
       .status(200)

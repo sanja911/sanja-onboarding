@@ -17,7 +17,7 @@ module.exports = {
     const role = findRole.get("users.role").toString();
     console.log(role);
     if (!["Manager", "Owner"].includes(role)) {
-      res.status(401).json({
+      res.status(403).json({
         success: false,
         message: "you are not authorized for this action",
         result: null,
@@ -48,7 +48,7 @@ module.exports = {
     const { id } = req.params;
     const project = await Project.findById(id);
     if (!project)
-      res.status(403).json({ success: false, message: "Data Not found" });
+      res.status(404).json({ success: false, message: "Data Not found" });
     return res.status(200).json({
       success: true,
       message: "Project found",

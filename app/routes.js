@@ -2,12 +2,8 @@ const express = require("express");
 const app = express();
 //var path=require('path');
 const router = new express.Router();
-const jwt = require("jsonwebtoken");
-const config = require("../config");
-//const seneca = require('seneca')()
 const Organization = require("./controller/organization");
 const Project = require("./controller/project");
-// const Invitation = require('./controller/invitation');
 const Task = require("./controller/task");
 const Users = require("./controller/user");
 const auth = require("./middleware/auth");
@@ -24,9 +20,6 @@ router.put("/project/:id", auth.isAuthenticated, Project.update);
 router.get("/project/:id", auth.isAuthenticated, Project.find);
 router.post("/project/:id", Project.findAll);
 router.delete("/project/:id", auth.isAuthenticated, Project.delete);
-// inv routes
-/*router.post('/invitation/', Invitation.create);
-router.get('/invitation/',Invitation.find);*/
 //task routes
 router.post("/task/", auth.isAuthenticated, Task.create);
 router.get("/task/:id", auth.isAuthenticated, Task.find);
