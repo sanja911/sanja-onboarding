@@ -4,9 +4,6 @@ const Organization = require("../models/Organization");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
-const { data } = require("jquery");
 module.exports = {
   create: async (req, res, next) => {
     const hash = bcrypt.hashSync(req.body.password, 10);
@@ -22,14 +19,14 @@ module.exports = {
   signin: async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     const pass = bcrypt.compareSync(req.body.password, user.password);
     const userInfo = await User.findOne(
       { email: req.body.email },
       { password: pass }
     );
     if (!userInfo)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     const token = jwt.sign({ id: userInfo._id }, config.JWT_SECRET, {
       expiresIn: "2h",
     });
@@ -74,24 +71,10 @@ module.exports = {
   },
   myOrganization: async (req, res) => {
     let data = res.locals.user;
-    const role = ["Manager", "Owner"];
-    const findUser = await User.findById(data.id).populate("orgId").exec();
-    const findOrg = await Organization.find({
-      $or: [
-        {
-          "users.userId": data.id,
-          "users.role": "Manager",
-        },
-      ],
+    const find = await Organization.find({
+      users: { $elemMatch: { userId: data.id } },
     }).exec();
-    const roles = findOrg.toString();
-    // console.log(findUser);
-    res.send(findOrg);
-
-    // console.log(JSON.stringify(findOrg, null, "\t"));
-    // console.log(roles);
-    // res.send(findOrg);
-    // console.log(org);
+    console.log(find);
   },
   update: async (req, res) => {
     const data = res.locals.user;
@@ -101,7 +84,7 @@ module.exports = {
     });
     const viewById = await User.find({ _id: data.id });
     if (!viewById)
-      res.status(403).json({ success: false, message: "User Not found" });
+      res.status(404).json({ success: false, message: "User Not found" });
     res.status(200).json({
       success: true,
       message: "User Updated",

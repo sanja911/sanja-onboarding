@@ -1,11 +1,7 @@
 const Organization = require("../models/Organization");
 const User = require("../models/User");
 const Project = require("../models/Project");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
+
 module.exports = {
   create: async (req, res) => {
     const { name } = req.body;
@@ -47,7 +43,7 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole) {
-      res.status(401).json({
+      res.status(403).json({
         success: false,
         message: "you are not authorized for this action",
         result: null,
@@ -72,7 +68,7 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole)
-      res.status(403).json({ success: false, message: "Data Not found" });
+      res.status(404).json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
     if (role === "Manager" || role === "Owner") {
       new Promise((resolve, reject) => {
