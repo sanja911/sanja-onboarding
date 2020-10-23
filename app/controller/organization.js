@@ -1,11 +1,6 @@
 const Organization = require("../models/Organization");
 const User = require("../models/User");
 const Project = require("../models/Project");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
 module.exports = {
   create: async (req, res) => {
     const { name } = req.body;
@@ -18,7 +13,7 @@ module.exports = {
     const userById = await User.findById(data.id);
     userById.orgId.push(organization);
     await userById.save();
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Organization Created",
       result: organization,
@@ -28,7 +23,11 @@ module.exports = {
   find: async (req, res) => {
     const { id } = req.params;
     const user = await Organization.findById(id);
-    res.status(200).json({
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
+    return res.status(200).json({
       success: true,
       message: "Organization Find",
       result: user,
@@ -37,7 +36,11 @@ module.exports = {
 
   findAll: async (req, res) => {
     const finds = await Organization.find();
-    res.status(200).json(finds);
+    if (!finds)
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
+    return res.status(200).json(finds);
   },
   update: async (req, res) => {
     const { id } = req.params;
@@ -47,7 +50,7 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole) {
-      res.status(401).json({
+      res.status(403).json({
         success: false,
         message: "you are not authorized for this action",
         result: null,
@@ -72,7 +75,9 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole)
-      res.status(403).json({ success: false, message: "Data Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
     if (role === "Manager" || role === "Owner") {
       new Promise((resolve, reject) => {
