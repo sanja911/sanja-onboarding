@@ -57,6 +57,7 @@ module.exports = {
     const findProject = await User.find({ _id: data.id })
       .populate("project")
       .exec();
+
     if (!findProject)
       res.status(404).json({ success: false, message: "User Not Found" });
     res.status(200).json({
@@ -75,6 +76,7 @@ module.exports = {
     return res.status(200).json({
       success: true,
       message: "My Organization List",
+
       result: findOrg,
     });
   },
@@ -122,9 +124,11 @@ module.exports = {
         )
         .catch((err) => console.log("error :", err))
         .then((result) => {
+
           res
             .status(200)
             .json({ message: "Data " + data.id + " Successful Deleted" });
+
         });
       //return res.json(org)
     });
