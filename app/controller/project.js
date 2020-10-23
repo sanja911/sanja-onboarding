@@ -48,7 +48,9 @@ module.exports = {
     const { id } = req.params;
     const project = await Project.findById(id);
     if (!project)
-      res.status(404).json({ success: false, message: "Data Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not found" });
     return res.status(200).json({
       success: true,
       message: "Project found",
@@ -59,7 +61,9 @@ module.exports = {
   findAll: async (req, res) => {
     const finds = await Project.find();
     if (!finds)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     return res
       .status(200)
       .json({ success: false, message: "Data Found", result: finds });
@@ -71,7 +75,9 @@ module.exports = {
     const data = res.locals.user;
     const organization = await Project.findById(id);
     if (!organization)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     // console.log(organization.organizationId)
     const updateProject = await Project.findOneAndUpdate(
       { _id: id },
@@ -91,7 +97,9 @@ module.exports = {
     const data = res.locals.user;
     const organization = await Project.findById(id);
     if (!organization)
-      res.status(403).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not found" });
     const findRole = await Organization.findOne(
       { _id: organization.organizationId },
       { users: { $elemMatch: { userId: data.id } } }
@@ -134,12 +142,6 @@ module.exports = {
               .status(200)
               .json({ message: "Data " + id + " Successful Deleted" });
           });
-      });
-    } else {
-      res.status(401).json({
-        success: false,
-        message: "you are not authorized for this action",
-        result: null,
       });
     }
   },

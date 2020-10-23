@@ -1,11 +1,6 @@
 const Organization = require("../models/Organization");
 const User = require("../models/User");
 const Project = require("../models/Project");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const config = require("../../config");
-const auth = require("../middleware/auth");
-const jwtdecode = require("jwt-decode");
 module.exports = {
   create: async (req, res) => {
     const { name } = req.body;
@@ -29,7 +24,9 @@ module.exports = {
     const { id } = req.params;
     const user = await Organization.findById(id);
     if (!user)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     return res.status(200).json({
       success: true,
       message: "Organization Find",
@@ -40,7 +37,9 @@ module.exports = {
   findAll: async (req, res) => {
     const finds = await Organization.find();
     if (!finds)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     return res.status(200).json(finds);
   },
   update: async (req, res) => {
@@ -76,7 +75,9 @@ module.exports = {
       { users: { $elemMatch: { userId: data.id } } }
     ).exec();
     if (!findRole)
-      res.status(404).json({ success: false, message: "Data Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not found" });
     const role = findRole.get("users.role").toString();
     if (role === "Manager" || role === "Owner") {
       new Promise((resolve, reject) => {

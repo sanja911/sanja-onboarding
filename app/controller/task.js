@@ -14,7 +14,9 @@ module.exports = {
     } = req.body;
     const userById = await Project.findById(projectId);
     if (!userById)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     const tasks = await Task.create({
       projectId,
       summary,
@@ -32,7 +34,9 @@ module.exports = {
     const { id } = req.params;
     const task = await Task.findById(id);
     if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     return res.json(task);
   },
   findAll: async (req, res) => {
@@ -47,7 +51,9 @@ module.exports = {
     const { id } = req.params;
     const task = await Task.findById(id);
     if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     const {
       summary,
       description,
@@ -64,7 +70,9 @@ module.exports = {
     const { id } = req.params;
     const task = await Task.findById(id);
     if (!task)
-      res.status(404).json({ success: false, message: "Data Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Data Not Found" });
     new Promise((resolve, reject) => {
       Task.findByIdAndDelete(id, (err, res) => {
         if (err) reject(err);

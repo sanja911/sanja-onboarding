@@ -19,14 +19,18 @@ module.exports = {
   signin: async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user)
-      res.status(404).json({ success: false, message: "User Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not found" });
     const pass = bcrypt.compareSync(req.body.password, user.password);
     const userInfo = await User.findOne(
       { email: req.body.email },
       { password: pass }
     );
     if (!userInfo)
-      res.status(404).json({ success: false, message: "User Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not found" });
     const token = jwt.sign({ id: userInfo._id }, config.JWT_SECRET, {
       expiresIn: "2h",
     });
@@ -39,7 +43,9 @@ module.exports = {
     const { id } = req.params;
     const find = await User.findById(id);
     if (!find)
-      res.status(404).json({ success: false, message: "User Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not found" });
     res.status(200).json({
       success: true,
       message: "User found",
@@ -80,7 +86,9 @@ module.exports = {
     });
     const viewById = await User.findById(data.id);
     if (!viewById)
-      res.status(404).json({ success: false, message: "User Not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not found" });
     return res.status(200).json({
       success: true,
       message: "User Updated",
